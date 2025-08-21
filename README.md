@@ -313,7 +313,26 @@ For multiple operations, consider the token reuse patterns documented in the HF-
 
 ## 📄 License
 
-This project is part of the HF-Inferoxy ecosystem. Please refer to the main project for licensing information.
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)**.
+
+### What this means:
+
+- **Freedom to Use**: You can use this software for any purpose
+- **Freedom to Study**: You can examine the source code and understand how it works
+- **Freedom to Modify**: You can modify the software to suit your needs
+- **Freedom to Share**: You can distribute copies of the original or modified software
+
+### Key AGPLv3 Requirements:
+
+- **Source Code Availability**: If you run a modified version on a server that others can access, you must provide the source code to those users
+- **Network Use**: The license extends to network use, ensuring that users interacting with the software over a network have access to the source code
+- **Copyleft**: Any derivative works must also be licensed under AGPLv3
+
+### Full License Text:
+
+The complete license text is available in the [LICENSE](LICENSE) file in this repository.
+
+For more information about AGPLv3, visit: https://www.gnu.org/licenses/agpl-3.0.en.html
 
 ---
 
