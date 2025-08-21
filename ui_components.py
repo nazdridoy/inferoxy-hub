@@ -33,7 +33,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                 container=False
             )
             chat_submit = gr.Button("Send", variant="primary", scale=1)
-            chat_stop = gr.Button("⏹ Stop", variant="secondary", scale=0)
+            chat_stop = gr.Button("⏹ Stop", variant="secondary", scale=0, visible=False)
         
         # Configuration options below the chat
         with gr.Row():
@@ -68,6 +68,14 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         create_chat_tips()
         
         # Connect chat events (streaming auto-detected from generator function)
+        # Show stop immediately when sending
+        chat_submit.click(
+            fn=lambda: gr.update(visible=True),
+            inputs=None,
+            outputs=[chat_stop],
+            queue=False
+        )
+
         chat_send_event = chat_submit.click(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
@@ -75,6 +83,14 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
             outputs=[chatbot_display, chat_input]
         )
         
+        # Show stop immediately when pressing Enter
+        chat_input.submit(
+            fn=lambda: gr.update(visible=True),
+            inputs=None,
+            outputs=[chat_stop],
+            queue=False
+        )
+
         chat_enter_event = chat_input.submit(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
@@ -84,11 +100,16 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
 
         # Stop current chat generation
         chat_stop.click(
-            fn=None,
+            fn=lambda: gr.update(visible=False),
             inputs=None,
-            outputs=None,
-            cancels=[chat_send_event, chat_enter_event]
+            outputs=[chat_stop],
+            cancels=[chat_send_event, chat_enter_event],
+            queue=False
         )
+
+        # Hide stop after completion of chat events
+        chat_send_event.then(lambda: gr.update(visible=False), None, [chat_stop], queue=False)
+        chat_enter_event.then(lambda: gr.update(visible=False), None, [chat_stop], queue=False)
 
         # Enable retry icon and bind handler if provided
         if handle_chat_retry_fn is not None:
@@ -222,7 +243,7 @@ def create_image_tab(handle_image_generation_fn):
                         size="lg",
                         scale=2
                     )
-                    stop_generate_btn = gr.Button("⏹ Stop", variant="secondary")
+                    stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
                 
                 # Quick model presets
                 create_image_presets(img_model_name, img_provider)
@@ -231,6 +252,14 @@ def create_image_tab(handle_image_generation_fn):
         create_image_examples(img_prompt)
         
         # Connect image generation events
+        # Show stop immediately when starting generation
+        generate_btn.click(
+            fn=lambda: gr.update(visible=True),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            queue=False
+        )
+
         gen_event = generate_btn.click(
             fn=handle_image_generation_fn,
             inputs=[
@@ -242,11 +271,15 @@ def create_image_tab(handle_image_generation_fn):
 
         # Stop current image generation
         stop_generate_btn.click(
-            fn=None,
+            fn=lambda: gr.update(visible=False),
             inputs=None,
-            outputs=None,
-            cancels=[gen_event]
+            outputs=[stop_generate_btn],
+            cancels=[gen_event],
+            queue=False
         )
+
+        # Hide stop after generation completes
+        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
 
 
 def create_image_presets(img_model_name, img_provider):
