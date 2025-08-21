@@ -78,22 +78,56 @@ The app requires:
 
 ## 🌟 Supported Models & Providers
 
-### Chat Models
+This application supports **any and all models** that are compatible with Hugging Face's inference providers. The platform uses HF-Inferoxy for intelligent token management and can automatically route requests to the best available provider.
 
-| Model | Provider | Description |
-|-------|----------|-------------|
-| `openai/gpt-oss-20b` | Fireworks AI, Cerebras, Groq | Fast general purpose model |
-| `meta-llama/Llama-2-7b-chat-hf` | HF Inference | Chat-optimized model |
-| `mistralai/Mistral-7B-Instruct-v0.2` | Featherless AI | Instruction following |
-| `CohereLabs/c4ai-command-r-plus` | Cohere | Advanced language model |
+### 🤖 Chat Models
 
-### Image Models
+**Universal Support**: Any text generation model available through HF inference providers, including:
 
-| Model | Provider | Description |
-|-------|----------|-------------|
-| `Qwen/Qwen-Image` | Fal.ai, Replicate | Advanced image generation (default) |
-| `black-forest-labs/FLUX.1-dev` | Nebius, Together | State-of-the-art image model |
-| `stabilityai/stable-diffusion-xl-base-1.0` | HF Inference, NScale | High-quality SDXL model |
+| Model Category | Examples | Providers |
+|----------------|----------|-----------|
+| **Open Source LLMs** | `openai/gpt-oss-20b`, `meta-llama/Llama-2-7b-chat-hf`, `microsoft/DialoGPT-medium` | Auto, Fireworks AI, Cerebras, Groq |
+| **Instruction Models** | `google/flan-t5-base`, `mistralai/Mistral-7B-Instruct-v0.2` | Auto, Together, Cohere |
+| **Multilingual Models** | `CohereLabs/c4ai-command-r-plus`, `bigscience/bloomz` | Cohere, Auto, Together |
+| **Specialized Models** | Any HF-hosted model with chat completion API | All supported providers |
+
+### 🎨 Image Models
+
+**Universal Support**: Any text-to-image model available through HF inference providers, including:
+
+| Model Category | Examples | Providers |
+|----------------|----------|-----------|
+| **Diffusion Models** | `stabilityai/stable-diffusion-xl-base-1.0`, `runwayml/stable-diffusion-v1-5` | HF Inference, NScale, Together |
+| **Advanced Generators** | `Qwen/Qwen-Image`, `black-forest-labs/FLUX.1-dev` | Fal.ai, Replicate, Nebius |
+| **Specialized Models** | Any HF-hosted image generation model | All supported providers |
+
+### 🌐 Supported Providers
+
+The application automatically works with all Hugging Face inference providers:
+
+- **Auto** - Intelligent provider selection (default)
+- **HF Inference** - Core Hugging Face API
+- **Fireworks AI** - Fast and reliable inference
+- **Cerebras** - High-performance computing
+- **Groq** - Ultra-fast inference
+- **Together** - Collaborative AI hosting
+- **Cohere** - Advanced language models
+- **Fal.ai** - High-quality image generation
+- **Replicate** - Collaborative AI hosting
+- **Nebius** - Cloud-native services
+- **NScale** - Optimized inference performance
+
+### 💡 How It Works
+
+1. **Model Format**: Use `model_name` or `model_name:provider` format
+2. **Auto Provider**: When no provider is specified, HF-Inferoxy automatically selects the best available provider
+3. **Fallback System**: If one provider fails, the system automatically tries alternatives
+4. **Token Management**: HF-Inferoxy handles token rotation and quota management automatically
+
+**Examples:**
+- `openai/gpt-oss-20b` (auto provider selection)
+- `openai/gpt-oss-20b:fireworks-ai` (specific provider)
+- `Qwen/Qwen-Image:fal-ai` (image model with specific provider)
 
 ## 🎨 Usage Examples
 
