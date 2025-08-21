@@ -4,14 +4,21 @@ Handles chat completion requests with streaming responses.
 """
 
 import os
+import time
+import threading
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from huggingface_hub import InferenceClient
 from huggingface_hub.errors import HfHubHTTPError
+from requests.exceptions import ConnectionError, Timeout, RequestException
 from hf_token_utils import get_proxy_token, report_token_status
 from utils import (
     validate_proxy_key, 
     parse_model_and_provider, 
     format_error_message
 )
+
+# Timeout configuration for inference requests
+INFERENCE_TIMEOUT = 120  # 2 minutes max for inference
 
 
 def chat_respond(
@@ -34,8 +41,9 @@ def chat_respond(
     
     proxy_api_key = os.getenv("PROXY_KEY")
     
+    token_id = None
     try:
-        # Get token from HF-Inferoxy proxy server
+        # Get token from HF-Inferoxy proxy server with timeout handling
         print(f"🔑 Chat: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ Chat: Got token: {token_id}")
@@ -58,7 +66,7 @@ def chat_respond(
             api_key=token
         )
         
-        print(f"🚀 Chat: Client created, starting inference...")
+        print(f"🚀 Chat: Client created, starting inference with timeout...")
         
         chat_completion_kwargs = {
             "model": model,
@@ -71,33 +79,89 @@ def chat_respond(
 
         response = ""
         
-        print(f"📡 Chat: Making streaming request...")
-        stream = client.chat_completion(**chat_completion_kwargs)
-        print(f"🔄 Chat: Got stream, starting to iterate...")
+        print(f"📡 Chat: Making streaming request with {INFERENCE_TIMEOUT}s timeout...")
+        
+        # Create streaming function for timeout handling
+        def create_stream():
+            return client.chat_completion(**chat_completion_kwargs)
+        
+        # Execute with timeout using ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(create_stream)
+            
+            try:
+                # Get the stream with timeout
+                stream = future.result(timeout=INFERENCE_TIMEOUT)
+                print(f"🔄 Chat: Got stream, starting to iterate...")
 
-        for message in stream:
-            choices = message.choices
-            token_content = ""
-            if len(choices) and choices[0].delta.content:
-                token_content = choices[0].delta.content
+                # Track streaming time to detect hangs
+                last_token_time = time.time()
+                token_timeout = 30  # 30 seconds between tokens
+                
+                for message in stream:
+                    current_time = time.time()
+                    
+                    # Check if we've been waiting too long for a token
+                    if current_time - last_token_time > token_timeout:
+                        raise TimeoutError(f"No response received for {token_timeout} seconds during streaming")
+                    
+                    choices = message.choices
+                    token_content = ""
+                    if len(choices) and choices[0].delta.content:
+                        token_content = choices[0].delta.content
+                        last_token_time = current_time  # Reset timer when we get content
 
-            response += token_content
-            yield response
+                    response += token_content
+                    yield response
+                    
+            except FutureTimeoutError:
+                future.cancel()  # Cancel the running task
+                raise TimeoutError(f"Chat request timed out after {INFERENCE_TIMEOUT} seconds")
         
         # Report successful token usage
-        report_token_status(token_id, "success", api_key=proxy_api_key)
+        if token_id:
+            report_token_status(token_id, "success", api_key=proxy_api_key)
+            
+    except ConnectionError as e:
+        # Handle proxy connection errors
+        error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
+        print(f"🔌 Chat connection error: {error_msg}")
+        if token_id:
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+        yield format_error_message("Connection Error", "Unable to connect to the proxy server. Please check if it's running.")
+        
+    except TimeoutError as e:
+        # Handle timeout errors
+        error_msg = f"Request timed out: {str(e)}"
+        print(f"⏰ Chat timeout: {error_msg}")
+        if token_id:
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+        yield format_error_message("Timeout Error", "The request took too long. The server may be overloaded. Please try again.")
         
     except HfHubHTTPError as e:
-        # Report HF Hub errors
-        if 'token_id' in locals():
-            report_token_status(token_id, "error", str(e), api_key=proxy_api_key)
-        yield format_error_message("HuggingFace API Error", str(e))
+        # Handle HuggingFace API errors
+        error_msg = str(e)
+        print(f"🤗 Chat HF error: {error_msg}")
+        if token_id:
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+        
+        # Provide more user-friendly error messages
+        if "401" in error_msg:
+            yield format_error_message("Authentication Error", "Invalid or expired API token. The proxy will provide a new token on retry.")
+        elif "402" in error_msg:
+            yield format_error_message("Quota Exceeded", "API quota exceeded. The proxy will try alternative providers.")
+        elif "429" in error_msg:
+            yield format_error_message("Rate Limited", "Too many requests. Please wait a moment and try again.")
+        else:
+            yield format_error_message("HuggingFace API Error", error_msg)
         
     except Exception as e:
-        # Report other errors
-        if 'token_id' in locals():
-            report_token_status(token_id, "error", str(e), api_key=proxy_api_key)
-        yield format_error_message("Unexpected Error", str(e))
+        # Handle all other errors
+        error_msg = str(e)
+        print(f"❌ Chat unexpected error: {error_msg}")
+        if token_id:
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+        yield format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
 def handle_chat_submit(message, history, system_msg, model_name, max_tokens, temperature, top_p):
