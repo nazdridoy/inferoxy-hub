@@ -193,3 +193,65 @@ def handle_chat_submit(message, history, system_msg, model_name, max_tokens, tem
         # Update history with the current partial response and yield it
         current_history = history + [{"role": "assistant", "content": assistant_response}]
         yield current_history, ""
+
+
+def handle_chat_retry(history, system_msg, model_name, max_tokens, temperature, top_p, retry_data=None):
+    """
+    Retry the assistant response for the selected message.
+    Works with gr.Chatbot.retry() which provides retry_data.index for the message.
+    """
+    # Guard: empty history
+    if not history:
+        yield history
+        return
+
+    # Determine which assistant message index to retry
+    retry_index = None
+    try:
+        retry_index = getattr(retry_data, "index", None)
+    except Exception:
+        retry_index = None
+
+    if retry_index is None:
+        # Fallback to last assistant message
+        retry_index = len(history) - 1
+
+    # Trim history up to the message being retried (exclude that assistant msg)
+    trimmed_history = list(history[:retry_index])
+
+    # Find the most recent user message before retry_index
+    last_user_idx = None
+    for idx in range(retry_index - 1, -1, -1):
+        if trimmed_history[idx].get("role") == "user":
+            last_user_idx = idx
+            break
+
+    # Nothing to retry if no prior user message
+    if last_user_idx is None:
+        yield history
+        return
+
+    # Message to retry and prior conversation context (before that user msg)
+    message = trimmed_history[last_user_idx].get("content", "")
+    prior_history = trimmed_history[:last_user_idx]
+
+    if not message.strip():
+        yield history
+        return
+
+    # Stream a new assistant response
+    response_generator = chat_respond(
+        message,
+        prior_history,
+        system_msg,
+        model_name,
+        max_tokens,
+        temperature,
+        top_p
+    )
+
+    assistant_response = ""
+    for partial_response in response_generator:
+        assistant_response = partial_response
+        current_history = trimmed_history + [{"role": "assistant", "content": assistant_response}]
+        yield current_history

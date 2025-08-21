@@ -11,7 +11,7 @@ from utils import (
 )
 
 
-def create_chat_tab(handle_chat_submit_fn):
+def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
     """
     Create the chat tab interface.
     """
@@ -80,6 +80,15 @@ def create_chat_tab(handle_chat_submit_fn):
                    chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
         )
+
+        # Enable retry icon and bind handler if provided
+        if handle_chat_retry_fn is not None:
+            chatbot_display.retry(
+                fn=handle_chat_retry_fn,
+                inputs=[chatbot_display, chat_system_message, chat_model_name, 
+                        chat_max_tokens, chat_temperature, chat_top_p],
+                outputs=chatbot_display
+            )
 
 
 def create_chat_tips():
@@ -289,3 +298,5 @@ def create_footer():
     
     **Built with ❤️ using [HF-Inferoxy](https://nazdridoy.github.io/hf-inferoxy/) for intelligent token management**
     """)
+
+
