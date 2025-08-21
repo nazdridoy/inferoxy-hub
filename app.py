@@ -199,38 +199,52 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
         
         # ==================== CHAT TAB ====================
         with gr.Tab("💬 Chat Assistant", id="chat"):
-            # Main chat interface - full width and prominent
-            chatbot = gr.ChatInterface(
-                chat_respond,
+            # Chat interface at the top - most prominent
+            chatbot_display = gr.Chatbot(
+                label="Chat",
                 type="messages",
-                title="",
-                description="",
-                additional_inputs=[
-                    gr.Textbox(
+                height=500,
+                show_copy_button=True
+            )
+            
+            # Chat input
+            with gr.Row():
+                chat_input = gr.Textbox(
+                    placeholder="Type your message here...",
+                    label="Message",
+                    scale=4,
+                    container=False
+                )
+                chat_submit = gr.Button("Send", variant="primary", scale=1)
+            
+            # Configuration options below the chat
+            with gr.Row():
+                with gr.Column(scale=1):
+                    chat_model_name = gr.Textbox(
                         value="openai/gpt-oss-20b",
                         label="Model Name",
                         placeholder="e.g., openai/gpt-oss-20b or openai/gpt-oss-20b:fireworks-ai"
-                    ),
-                    gr.Textbox(
+                    )
+                    chat_system_message = gr.Textbox(
                         value="You are a helpful and friendly AI assistant. Provide clear, accurate, and helpful responses.",
                         label="System Message",
                         lines=2,
                         placeholder="Define the assistant's personality and behavior..."
-                    ),
-                    gr.Slider(
+                    )
+                
+                with gr.Column(scale=1):
+                    chat_max_tokens = gr.Slider(
                         minimum=1, maximum=4096, value=1024, step=1,
                         label="Max New Tokens"
-                    ),
-                    gr.Slider(
+                    )
+                    chat_temperature = gr.Slider(
                         minimum=0.1, maximum=2.0, value=0.7, step=0.1,
                         label="Temperature"
-                    ),
-                    gr.Slider(
+                    )
+                    chat_top_p = gr.Slider(
                         minimum=0.1, maximum=1.0, value=0.95, step=0.05,
                         label="Top-p (nucleus sampling)"
-                    ),
-                ],
-            )
+                    )
             
             # Configuration tips below the chat
             with gr.Row():
@@ -264,6 +278,50 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
                     - `openai/gpt-oss-20b` (auto provider)
                     - `openai/gpt-oss-20b:fireworks-ai` (specific provider)
                     """)
+            
+            # Chat functionality
+            def handle_chat_submit(message, history, system_msg, model_name, max_tokens, temperature, top_p):
+                if not message.strip():
+                    return history, ""
+                
+                # Add user message to history
+                history = history + [{"role": "user", "content": message}]
+                
+                # Generate response
+                response_generator = chat_respond(
+                    message, 
+                    history[:-1],  # Don't include the current message in history for the function
+                    system_msg, 
+                    model_name, 
+                    max_tokens, 
+                    temperature, 
+                    top_p
+                )
+                
+                # Get the final response
+                assistant_response = ""
+                for partial_response in response_generator:
+                    assistant_response = partial_response
+                
+                # Add assistant response to history
+                history = history + [{"role": "assistant", "content": assistant_response}]
+                
+                return history, ""
+            
+            # Connect chat events
+            chat_submit.click(
+                fn=handle_chat_submit,
+                inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
+                       chat_max_tokens, chat_temperature, chat_top_p],
+                outputs=[chatbot_display, chat_input]
+            )
+            
+            chat_input.submit(
+                fn=handle_chat_submit,
+                inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
+                       chat_max_tokens, chat_temperature, chat_top_p],
+                outputs=[chatbot_display, chat_input]
+            )
         
         # ==================== IMAGE GENERATION TAB ====================
         with gr.Tab("🎨 Image Generator", id="image"):
