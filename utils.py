@@ -82,6 +82,19 @@ def validate_proxy_key():
     return True, ""
 
 
+def get_proxy_url():
+    """Get the proxy URL from environment variables."""
+    return os.getenv("PROXY_URL")
+
+
+def validate_proxy_url():
+    """Validate that the proxy URL is available."""
+    proxy_url = get_proxy_url()
+    if not proxy_url:
+        return False, "❌ Error: PROXY_URL not found in environment variables. Please set it in your HuggingFace Space secrets."
+    return True, ""
+
+
 def parse_model_and_provider(model_name):
     """
     Parse model name and provider from a string like 'model:provider'.

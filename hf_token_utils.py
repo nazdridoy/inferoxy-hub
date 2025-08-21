@@ -5,18 +5,19 @@ import json
 import time
 from typing import Dict, Optional, Any, Tuple
 from requests.exceptions import ConnectionError, Timeout, RequestException
+from utils import get_proxy_url, validate_proxy_url
 
 # Timeout and retry configuration
 REQUEST_TIMEOUT = 30  # 30 seconds timeout
 RETRY_ATTEMPTS = 2
 RETRY_DELAY = 1  # 1 second delay between retries
 
-def get_proxy_token(proxy_url: str = "http://scw.nazdev.tech:11155", api_key: str = None) -> Tuple[str, str]:
+def get_proxy_token(proxy_url: str = None, api_key: str = None) -> Tuple[str, str]:
     """
     Get a valid token from the proxy server with timeout and retry logic.
     
     Args:
-        proxy_url: URL of the HF-Inferoxy server
+        proxy_url: URL of the HF-Inferoxy server (optional, will use PROXY_URL env var if not provided)
         api_key: Your API key for authenticating with the proxy server
         
     Returns:
@@ -27,6 +28,13 @@ def get_proxy_token(proxy_url: str = "http://scw.nazdev.tech:11155", api_key: st
         TimeoutError: If request times out
         Exception: If token provisioning fails
     """
+    # Get proxy URL from environment if not provided
+    if proxy_url is None:
+        is_valid, error_msg = validate_proxy_url()
+        if not is_valid:
+            raise Exception(error_msg)
+        proxy_url = get_proxy_url()
+    
     headers = {}
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
@@ -90,7 +98,7 @@ def report_token_status(
     token_id: str, 
     status: str = "success", 
     error: Optional[str] = None,
-    proxy_url: str = "http://scw.nazdev.tech:11155",
+    proxy_url: str = None,
     api_key: str = None
 ) -> bool:
     """
@@ -100,12 +108,20 @@ def report_token_status(
         token_id: ID of the token to report (from get_proxy_token)
         status: Status to report ('success' or 'error')
         error: Error message if status is 'error'
-        proxy_url: URL of the HF-Inferoxy server
+        proxy_url: URL of the HF-Inferoxy server (optional, will use PROXY_URL env var if not provided)
         api_key: Your API key for authenticating with the proxy server
         
     Returns:
         True if report was accepted, False otherwise
     """
+    # Get proxy URL from environment if not provided
+    if proxy_url is None:
+        is_valid, error_msg = validate_proxy_url()
+        if not is_valid:
+            print(f"❌ {error_msg}")
+            return False
+        proxy_url = get_proxy_url()
+    
     payload = {"token_id": token_id, "status": status}
     
     if error:

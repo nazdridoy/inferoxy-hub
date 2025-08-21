@@ -36,14 +36,17 @@ A comprehensive AI platform that combines conversational AI and text-to-image ge
 
 ### 1. HuggingFace Space Secrets
 
-Add the following secret to your HuggingFace Space:
+Add the following secrets to your HuggingFace Space:
 
 - **Key**: `PROXY_KEY`
 - **Value**: Your HF-Inferoxy proxy API key
 
+- **Key**: `PROXY_URL`
+- **Value**: Your HF-Inferoxy proxy server URL (e.g., `https://hf-proxy.example.com`)
+
 ### 2. HF-Inferoxy Server
 
-The app is configured to use the HF-Inferoxy server at: `http://scw.nazdev.tech:11155`
+The app will use the HF-Inferoxy server URL specified in the `PROXY_URL` secret.
 
 ### 3. Dependencies
 
@@ -219,8 +222,9 @@ Prompt: "Help me debug this Python code: [paste code]"
 
 #### Setup Issues
 1. **PROXY_KEY Missing**: Ensure the secret is set in your HuggingFace Space settings
-2. **Connection Errors**: Verify the HF-Inferoxy server is accessible
-3. **Import Errors**: Check that all dependencies are properly installed
+2. **PROXY_URL Missing**: Ensure the proxy server URL secret is set in your HuggingFace Space settings
+3. **Connection Errors**: Verify the HF-Inferoxy server is accessible
+4. **Import Errors**: Check that all dependencies are properly installed
 
 #### Chat Issues
 1. **No Response**: Check model name format and provider availability
