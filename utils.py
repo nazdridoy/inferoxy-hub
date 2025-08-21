@@ -10,6 +10,8 @@ import os
 DEFAULT_CHAT_MODEL = "openai/gpt-oss-20b"
 DEFAULT_IMAGE_MODEL = "Qwen/Qwen-Image"
 DEFAULT_IMAGE_PROVIDER = "fal-ai"
+DEFAULT_IMAGE_TO_IMAGE_MODEL = "Qwen/Qwen-Image-Edit"
+DEFAULT_IMAGE_TO_IMAGE_PROVIDER = "fal-ai"
 
 # Chat configuration
 CHAT_CONFIG = {
@@ -56,6 +58,14 @@ IMAGE_MODEL_PRESETS = [
     ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
 ]
 
+# Model presets for image-to-image generation
+IMAGE_TO_IMAGE_MODEL_PRESETS = [
+    ("Qwen Image Edit (Fal.ai)", "Qwen/Qwen-Image-Edit", "fal-ai"),
+    ("Qwen Image Edit (Replicate)", "Qwen/Qwen-Image-Edit", "replicate"),
+    ("FLUX.1 Kontext (Nebius)", "black-forest-labs/FLUX.1-Kontext-dev", "nebius"),
+    ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
+]
+
 # Example prompts for image generation
 IMAGE_EXAMPLE_PROMPTS = [
     "A majestic dragon flying over a medieval castle, epic fantasy art, detailed, 8k",
@@ -66,6 +76,18 @@ IMAGE_EXAMPLE_PROMPTS = [
     "Portrait of a wise old wizard with flowing robes, magical aura, fantasy character art",
     "A cozy coffee shop on a rainy day, warm lighting, peaceful atmosphere, detailed",
     "An astronaut floating in space with Earth in background, photorealistic, stunning"
+]
+
+# Example prompts for image-to-image generation
+IMAGE_TO_IMAGE_EXAMPLE_PROMPTS = [
+    "Turn the cat into a tiger with stripes and fierce expression",
+    "Make the background a magical forest with glowing mushrooms",
+    "Change the style to vintage comic book with bold colors",
+    "Add a superhero cape and mask to the person",
+    "Transform the building into a futuristic skyscraper",
+    "Make the flowers bloom and add butterflies around them",
+    "Change the weather to a stormy night with lightning",
+    "Add a magical portal in the background with sparkles"
 ]
 
 

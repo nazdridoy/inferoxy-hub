@@ -6,8 +6,9 @@ Contains functions to create different sections of the Gradio interface.
 import gradio as gr
 from utils import (
     DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_PROVIDER,
+    DEFAULT_IMAGE_TO_IMAGE_MODEL, DEFAULT_IMAGE_TO_IMAGE_PROVIDER,
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS, IMAGE_MODEL_PRESETS,
-    IMAGE_EXAMPLE_PROMPTS
+    IMAGE_TO_IMAGE_MODEL_PRESETS, IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS
 )
 
 
@@ -282,6 +283,154 @@ def create_image_tab(handle_image_generation_fn):
         gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
 
 
+def create_image_to_image_tab(handle_image_to_image_generation_fn):
+    """
+    Create the image-to-image tab interface.
+    """
+    with gr.Tab("🖼️ Image-to-Image", id="image-to-image"):
+        with gr.Row():
+            with gr.Column(scale=1):
+                # Input image
+                input_image = gr.Image(
+                    label="Input Image", 
+                    type="pil",
+                    height=400,
+                    show_download_button=True
+                )
+                
+                # Model and provider inputs
+                with gr.Group():
+                    gr.Markdown("**🤖 Model & Provider**")
+                    img2img_model_name = gr.Textbox(
+                        value=DEFAULT_IMAGE_TO_IMAGE_MODEL,
+                        label="Model Name",
+                        placeholder="e.g., Qwen/Qwen-Image-Edit or black-forest-labs/FLUX.1-Kontext-dev"
+                    )
+                    img2img_provider = gr.Dropdown(
+                        choices=IMAGE_PROVIDERS,
+                        value=DEFAULT_IMAGE_TO_IMAGE_PROVIDER,
+                        label="Provider",
+                        interactive=True
+                    )
+            
+            with gr.Column(scale=1):
+                # Output image
+                output_image = gr.Image(
+                    label="Generated Image", 
+                    type="pil",
+                    height=400,
+                    show_download_button=True
+                )
+                status_text = gr.Textbox(
+                    label="Generation Status", 
+                    interactive=False,
+                    lines=2
+                )
+            
+            with gr.Column(scale=1):
+                # Generation parameters
+                with gr.Group():
+                    gr.Markdown("**📝 Prompts**")
+                    img2img_prompt = gr.Textbox(
+                        value=IMAGE_TO_IMAGE_EXAMPLE_PROMPTS[0],  # Use first example as default
+                        label="Prompt",
+                        lines=3,
+                        placeholder="Describe how you want to modify the image..."
+                    )
+                    img2img_negative_prompt = gr.Textbox(
+                        value=IMAGE_CONFIG["negative_prompt"],
+                        label="Negative Prompt",
+                        lines=2,
+                        placeholder="Describe what you DON'T want in the modified image..."
+                    )
+                
+                with gr.Group():
+                    gr.Markdown("**⚙️ Generation Settings**")
+                    with gr.Row():
+                        img2img_steps = gr.Slider(
+                            minimum=10, maximum=100, value=IMAGE_CONFIG["num_inference_steps"], step=1,
+                            label="Inference Steps", info="More steps = better quality"
+                        )
+                        img2img_guidance = gr.Slider(
+                            minimum=1.0, maximum=20.0, value=IMAGE_CONFIG["guidance_scale"], step=0.5,
+                            label="Guidance Scale", info="How closely to follow prompt"
+                        )
+                    
+                    img2img_seed = gr.Slider(
+                        minimum=-1, maximum=999999, value=IMAGE_CONFIG["seed"], step=1,
+                        label="Seed", info="-1 for random"
+                    )
+                
+                # Generate and Stop buttons
+                with gr.Row():
+                    generate_btn = gr.Button(
+                        "🖼️ Generate Image-to-Image", 
+                        variant="primary", 
+                        size="lg",
+                        scale=2
+                    )
+                    stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
+                
+                # Quick model presets
+                create_image_to_image_presets(img2img_model_name, img2img_provider)
+        
+        # Examples for image-to-image generation
+        create_image_to_image_examples(img2img_prompt)
+        
+        # Connect image-to-image generation events
+        # Show stop immediately when starting generation
+        generate_btn.click(
+            fn=lambda: gr.update(visible=True),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            queue=False
+        )
+
+        gen_event = generate_btn.click(
+            fn=handle_image_to_image_generation_fn,
+            inputs=[
+                input_image, img2img_prompt, img2img_model_name, img2img_provider, img2img_negative_prompt,
+                img2img_steps, img2img_guidance, img2img_seed
+            ],
+            outputs=[output_image, status_text]
+        )
+
+        # Stop current image-to-image generation
+        stop_generate_btn.click(
+            fn=lambda: gr.update(visible=False),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            cancels=[gen_event],
+            queue=False
+        )
+
+        # Hide stop after generation completes
+        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+
+
+def create_image_to_image_presets(img2img_model_name, img2img_provider):
+    """Create quick model presets for image-to-image generation."""
+    with gr.Group():
+        gr.Markdown("**🎯 Popular Presets**")
+        
+        for name, model, provider in IMAGE_TO_IMAGE_MODEL_PRESETS:
+            btn = gr.Button(name, size="sm")
+            btn.click(
+                lambda m=model, p=provider: (m, p),
+                outputs=[img2img_model_name, img2img_provider]
+            )
+
+
+def create_image_to_image_examples(img2img_prompt):
+    """Create example prompts for image-to-image generation."""
+    with gr.Group():
+        gr.Markdown("**🌟 Example Prompts**")
+        img2img_examples = gr.Examples(
+            examples=[[prompt] for prompt in IMAGE_TO_IMAGE_EXAMPLE_PROMPTS],
+            inputs=img2img_prompt
+        )
+
+
 def create_image_presets(img_model_name, img_provider):
     """Create quick model presets for image generation."""
     with gr.Group():
@@ -315,6 +464,7 @@ def create_main_header():
     **Features:**
     - 💬 **Smart Chat**: Conversational AI with streaming responses
     - 🎨 **Image Generation**: Text-to-image creation with multiple providers  
+    - 🖼️ **Image-to-Image**: Transform and modify existing images with AI
     - 🔄 **Intelligent Token Management**: Automatic token rotation and error handling
     - 🌐 **Multi-Provider Support**: Works with HF Inference, Cerebras, Cohere, Groq, Together, Fal.ai, and more
     """)
@@ -336,6 +486,13 @@ def create_footer():
     - Use negative prompts to avoid unwanted elements  
     - Experiment with different models and providers for varied styles
     - Higher inference steps = better quality but slower generation
+    
+    **Image-to-Image Tab:**
+    - Upload an input image you want to modify
+    - Describe the changes you want to make to the image
+    - Use negative prompts to avoid unwanted modifications
+    - Perfect for style transfers, object additions, and image transformations
+    - Works great with models like Qwen Image Edit and FLUX.1 Kontext
     
     **Supported Providers:**
     - **fal-ai**: High-quality image generation (default for images)
