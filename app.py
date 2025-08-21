@@ -116,13 +116,19 @@ def generate_image(
     
     try:
         # Get token from HF-Inferoxy proxy server
+        print(f"🔑 Image: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
+        print(f"✅ Image: Got token: {token_id}")
+        
+        print(f"🎨 Image: Using model='{model_name}', provider='{provider}'")
         
         # Create client with specified provider
         client = InferenceClient(
             provider=provider,
             api_key=token
         )
+        
+        print(f"🚀 Image: Client created, preparing generation params...")
         
         # Prepare generation parameters
         generation_params = {
@@ -140,8 +146,13 @@ def generate_image(
         if seed != -1:
             generation_params["seed"] = seed
         
+        print(f"📐 Image: Dimensions: {width}x{height}, steps: {num_inference_steps}, guidance: {guidance_scale}")
+        print(f"📡 Image: Making generation request...")
+        
         # Generate image
         image = client.text_to_image(**generation_params)
+        
+        print(f"🖼️ Image: Generation completed! Image type: {type(image)}")
         
         # Report successful token usage
         report_token_status(token_id, "success", api_key=proxy_api_key)
@@ -188,64 +199,70 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
         
         # ==================== CHAT TAB ====================
         with gr.Tab("💬 Chat Assistant", id="chat"):
+            # Main chat interface - full width and prominent
+            chatbot = gr.ChatInterface(
+                chat_respond,
+                type="messages",
+                title="",
+                description="",
+                additional_inputs=[
+                    gr.Textbox(
+                        value="openai/gpt-oss-20b",
+                        label="Model Name",
+                        placeholder="e.g., openai/gpt-oss-20b or openai/gpt-oss-20b:fireworks-ai"
+                    ),
+                    gr.Textbox(
+                        value="You are a helpful and friendly AI assistant. Provide clear, accurate, and helpful responses.",
+                        label="System Message",
+                        lines=2,
+                        placeholder="Define the assistant's personality and behavior..."
+                    ),
+                    gr.Slider(
+                        minimum=1, maximum=4096, value=1024, step=1,
+                        label="Max New Tokens"
+                    ),
+                    gr.Slider(
+                        minimum=0.1, maximum=2.0, value=0.7, step=0.1,
+                        label="Temperature"
+                    ),
+                    gr.Slider(
+                        minimum=0.1, maximum=1.0, value=0.95, step=0.05,
+                        label="Top-p (nucleus sampling)"
+                    ),
+                ],
+            )
+            
+            # Configuration tips below the chat
             with gr.Row():
-                with gr.Column(scale=3):
-                    # Create chat interface
-                    chatbot = gr.ChatInterface(
-                        chat_respond,
-                        type="messages",
-                        title="",
-                        description="",
-                        additional_inputs=[
-                            gr.Textbox(
-                                value="You are a helpful and friendly AI assistant. Provide clear, accurate, and helpful responses.",
-                                label="System Message",
-                                lines=2,
-                                placeholder="Define the assistant's personality and behavior..."
-                            ),
-                            gr.Textbox(
-                                value="openai/gpt-oss-20b:fireworks-ai",
-                                label="Model Name",
-                                placeholder="e.g., openai/gpt-oss-20b:fireworks-ai or mistralai/Mistral-7B-Instruct-v0.2:groq"
-                            ),
-                            gr.Slider(
-                                minimum=1, maximum=4096, value=1024, step=1,
-                                label="Max New Tokens"
-                            ),
-                            gr.Slider(
-                                minimum=0.1, maximum=2.0, value=0.7, step=0.1,
-                                label="Temperature"
-                            ),
-                            gr.Slider(
-                                minimum=0.1, maximum=1.0, value=0.95, step=0.05,
-                                label="Top-p (nucleus sampling)"
-                            ),
-                        ],
-                    )
-                
-                with gr.Column(scale=1):
+                with gr.Column():
                     gr.Markdown("""
                     ### 💡 Chat Tips
                     
                     **Model Format:**
-                    - Single model: `openai/gpt-oss-20b`
-                    - With provider: `model:provider`
+                    - Single model: `openai/gpt-oss-20b` (uses auto provider)
+                    - With provider: `openai/gpt-oss-20b:fireworks-ai`
                     
                     **Popular Models:**
                     - `openai/gpt-oss-20b` - Fast general purpose
                     - `meta-llama/Llama-2-7b-chat-hf` - Chat optimized
                     - `microsoft/DialoGPT-medium` - Conversation
                     - `google/flan-t5-base` - Instruction following
+                    """)
+                
+                with gr.Column():
+                    gr.Markdown("""
+                    ### 🚀 Popular Providers
                     
-                    **Popular Providers:**
-                    - `fireworks-ai` - Fast and reliable
-                    - `cerebras` - High performance
-                    - `groq` - Ultra-fast inference  
-                    - `together` - Wide model support
-                    - `cohere` - Advanced language models
+                    - **auto** - Let HF choose best provider (default)
+                    - **fireworks-ai** - Fast and reliable
+                    - **cerebras** - High performance
+                    - **groq** - Ultra-fast inference  
+                    - **together** - Wide model support
+                    - **cohere** - Advanced language models
                     
-                    **Example:**
-                    `openai/gpt-oss-20b:fireworks-ai`
+                    **Examples:**
+                    - `openai/gpt-oss-20b` (auto provider)
+                    - `openai/gpt-oss-20b:fireworks-ai` (specific provider)
                     """)
         
         # ==================== IMAGE GENERATION TAB ====================

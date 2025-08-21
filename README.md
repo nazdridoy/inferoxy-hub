@@ -102,8 +102,12 @@ The app requires:
 3. Adjust parameters if needed (temperature, model, etc.)
 4. Watch the AI respond with streaming text
 
-#### Custom Model with Provider
+#### Model Examples
 ```
+# Auto provider (default - let HF choose best)
+Model Name: openai/gpt-oss-20b
+
+# Specific provider
 Model Name: openai/gpt-oss-20b:fireworks-ai
 System Message: You are a helpful coding assistant specializing in Python.
 ```
@@ -141,6 +145,7 @@ System Message: You are a helpful coding assistant specializing in Python.
 ## 🎯 Provider-Specific Features
 
 ### Chat Providers
+- **Auto**: Let HuggingFace choose the best provider (default)
 - **Fireworks AI**: Fast and reliable inference service
 - **Cerebras**: High-performance inference with low latency
 - **Cohere**: Advanced language models with multilingual support
@@ -175,8 +180,15 @@ System Message: You are a helpful coding assistant specializing in Python.
 
 #### Chat Examples
 ```
-"Explain quantum computing in simple terms"
-"Help me debug this Python code: [paste code]"
+# Using auto provider (default)
+Model: openai/gpt-oss-20b
+Prompt: "Explain quantum computing in simple terms"
+
+# Using specific provider
+Model: openai/gpt-oss-20b:fireworks-ai  
+Prompt: "Help me debug this Python code: [paste code]"
+
+# Other example prompts:
 "Write a creative story about a time-traveling cat"
 "What are the pros and cons of renewable energy?"
 ```
