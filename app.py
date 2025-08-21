@@ -203,7 +203,7 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
             chatbot_display = gr.Chatbot(
                 label="Chat",
                 type="messages",
-                height=1000,
+                height=800,
                 show_copy_button=True
             )
             
