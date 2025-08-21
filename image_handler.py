@@ -208,7 +208,10 @@ def generate_image_to_image(
         
         # Create generation function for timeout handling
         def generate_image_task():
-            return client.image_to_image(**generation_params)
+            return client.image_to_image(
+                model=model_name,
+                **generation_params
+            )
         
         # Execute with timeout using ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=1) as executor:
