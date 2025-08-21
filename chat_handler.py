@@ -102,15 +102,16 @@ def chat_respond(
 
 def handle_chat_submit(message, history, system_msg, model_name, max_tokens, temperature, top_p):
     """
-    Handle chat submission and manage conversation history.
+    Handle chat submission and manage conversation history with streaming.
     """
     if not message.strip():
-        return history, ""
+        yield history, ""
+        return
     
     # Add user message to history
     history = history + [{"role": "user", "content": message}]
     
-    # Generate response
+    # Generate response with streaming
     response_generator = chat_respond(
         message, 
         history[:-1],  # Don't include the current message in history for the function
@@ -121,12 +122,10 @@ def handle_chat_submit(message, history, system_msg, model_name, max_tokens, tem
         top_p
     )
     
-    # Get the final response
+    # Stream the assistant response token by token
     assistant_response = ""
     for partial_response in response_generator:
         assistant_response = partial_response
-    
-    # Add assistant response to history
-    history = history + [{"role": "assistant", "content": assistant_response}]
-    
-    return history, ""
+        # Update history with the current partial response and yield it
+        current_history = history + [{"role": "assistant", "content": assistant_response}]
+        yield current_history, ""
