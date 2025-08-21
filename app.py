@@ -203,7 +203,7 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
             chatbot_display = gr.Chatbot(
                 label="Chat",
                 type="messages",
-                height=500,
+                height=1000,
                 show_copy_button=True
             )
             
@@ -345,13 +345,13 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
                     with gr.Group():
                         gr.Markdown("**🤖 Model & Provider**")
                         img_model_name = gr.Textbox(
-                            value="stabilityai/stable-diffusion-xl-base-1.0",
+                            value="Qwen/Qwen-Image",
                             label="Model Name",
-                            placeholder="e.g., stabilityai/stable-diffusion-xl-base-1.0"
+                            placeholder="e.g., Qwen/Qwen-Image or stabilityai/stable-diffusion-xl-base-1.0"
                         )
                         img_provider = gr.Dropdown(
                             choices=["hf-inference", "fal-ai", "nebius", "nscale", "replicate", "together"],
-                            value="hf-inference",
+                            value="fal-ai",
                             label="Provider",
                             interactive=True
                         )
@@ -412,10 +412,10 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
                         gr.Markdown("**🎯 Popular Presets**")
                         preset_buttons = []
                         presets = [
-                            ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
-                            ("FLUX.1 (Nebius)", "black-forest-labs/FLUX.1-dev", "nebius"), 
                             ("Qwen (Fal.ai)", "Qwen/Qwen-Image", "fal-ai"),
-                            ("SDXL (NScale)", "stabilityai/stable-diffusion-xl-base-1.0", "nscale"),
+                            ("Qwen (Replicate)", "Qwen/Qwen-Image", "replicate"),
+                            ("FLUX.1 (Nebius)", "black-forest-labs/FLUX.1-dev", "nebius"), 
+                            ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
                         ]
                         
                         for name, model, provider in presets:
@@ -489,12 +489,12 @@ with gr.Blocks(title="HF-Inferoxy AI Hub", theme=gr.themes.Soft()) as demo:
     - Higher inference steps = better quality but slower generation
     
     **Supported Providers:**
+    - **fal-ai**: High-quality image generation (default for images)
     - **hf-inference**: Core API with comprehensive model support
     - **cerebras**: High-performance inference 
     - **cohere**: Advanced language models with multilingual support
     - **groq**: Ultra-fast inference, optimized for speed
     - **together**: Collaborative AI hosting, wide model support
-    - **fal-ai**: High-quality image generation
     - **nebius**: Cloud-native services with enterprise features
     - **nscale**: Optimized inference performance 
     - **replicate**: Collaborative AI hosting

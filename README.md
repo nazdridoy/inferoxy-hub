@@ -88,9 +88,9 @@ The app requires:
 
 | Model | Provider | Description |
 |-------|----------|-------------|
-| `stabilityai/stable-diffusion-xl-base-1.0` | HF Inference, NScale | High-quality SDXL model |
+| `Qwen/Qwen-Image` | Fal.ai, Replicate | Advanced image generation (default) |
 | `black-forest-labs/FLUX.1-dev` | Nebius, Together | State-of-the-art image model |
-| `Qwen/Qwen-Image` | Fal.ai, Replicate | Advanced image generation |
+| `stabilityai/stable-diffusion-xl-base-1.0` | HF Inference, NScale | High-quality SDXL model |
 
 ## 🎨 Usage Examples
 
