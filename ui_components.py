@@ -33,6 +33,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                 container=False
             )
             chat_submit = gr.Button("Send", variant="primary", scale=1)
+            chat_stop = gr.Button("⏹ Stop", variant="secondary", scale=0)
         
         # Configuration options below the chat
         with gr.Row():
@@ -67,18 +68,26 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         create_chat_tips()
         
         # Connect chat events (streaming auto-detected from generator function)
-        chat_submit.click(
+        chat_send_event = chat_submit.click(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
                    chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
         )
         
-        chat_input.submit(
+        chat_enter_event = chat_input.submit(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
                    chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
+        )
+
+        # Stop current chat generation
+        chat_stop.click(
+            fn=None,
+            inputs=None,
+            outputs=None,
+            cancels=[chat_send_event, chat_enter_event]
         )
 
         # Enable retry icon and bind handler if provided
@@ -205,13 +214,15 @@ def create_image_tab(handle_image_generation_fn):
                         label="Seed", info="-1 for random"
                     )
                 
-                # Generate button
-                generate_btn = gr.Button(
-                    "🎨 Generate Image", 
-                    variant="primary", 
-                    size="lg",
-                    scale=2
-                )
+                # Generate and Stop buttons
+                with gr.Row():
+                    generate_btn = gr.Button(
+                        "🎨 Generate Image", 
+                        variant="primary", 
+                        size="lg",
+                        scale=2
+                    )
+                    stop_generate_btn = gr.Button("⏹ Stop", variant="secondary")
                 
                 # Quick model presets
                 create_image_presets(img_model_name, img_provider)
@@ -220,13 +231,21 @@ def create_image_tab(handle_image_generation_fn):
         create_image_examples(img_prompt)
         
         # Connect image generation events
-        generate_btn.click(
+        gen_event = generate_btn.click(
             fn=handle_image_generation_fn,
             inputs=[
                 img_prompt, img_model_name, img_provider, img_negative_prompt,
                 img_width, img_height, img_steps, img_guidance, img_seed
             ],
             outputs=[output_image, status_text]
+        )
+
+        # Stop current image generation
+        stop_generate_btn.click(
+            fn=None,
+            inputs=None,
+            outputs=None,
+            cancels=[gen_event]
         )
 
 
