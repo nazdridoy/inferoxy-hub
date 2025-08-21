@@ -66,21 +66,19 @@ def create_chat_tab(handle_chat_submit_fn):
         # Configuration tips below the chat
         create_chat_tips()
         
-        # Connect chat events with streaming enabled
+        # Connect chat events (streaming auto-detected from generator function)
         chat_submit.click(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
                    chat_max_tokens, chat_temperature, chat_top_p],
-            outputs=[chatbot_display, chat_input],
-            stream=True
+            outputs=[chatbot_display, chat_input]
         )
         
         chat_input.submit(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
                    chat_max_tokens, chat_temperature, chat_top_p],
-            outputs=[chatbot_display, chat_input],
-            stream=True
+            outputs=[chatbot_display, chat_input]
         )
 
 
