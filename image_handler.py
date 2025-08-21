@@ -192,7 +192,7 @@ def generate_image_to_image(
         
         # Prepare generation parameters
         generation_params = {
-            "input_image": input_image,
+            "image": input_image,
             "prompt": prompt,
             "num_inference_steps": num_inference_steps,
             "guidance_scale": guidance_scale,
