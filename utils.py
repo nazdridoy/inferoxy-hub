@@ -4,6 +4,7 @@ Contains configuration constants and helper functions.
 """
 
 import os
+import re
 import requests
 
 
@@ -290,3 +291,42 @@ def check_org_access(access_token: str) -> tuple[bool, str, str | None, list[str
 def format_access_denied_message(message: str) -> str:
     """Return a standardized access denied message for UI display."""
     return format_error_message("Access Denied", message)
+
+
+# -----------------------------
+# Reasoning (<think>) utilities
+# -----------------------------
+
+def render_with_reasoning_toggle(text: str, show_reasoning: bool) -> str:
+    """Render assistant text while optionally revealing content inside <think>...</think>.
+
+    When show_reasoning is True, wrap the reasoning content in a collapsible HTML details block
+    with a fenced code block for readability. When False, strip the reasoning content entirely.
+
+    This function is designed to be called repeatedly during streaming; it will simply do nothing
+    until both opening and closing tags appear in the text.
+    """
+    if not isinstance(text, str) or "<think>" not in text:
+        return text
+
+    pattern = re.compile(r"<think>([\s\S]*?)</think>", re.IGNORECASE)
+
+    # If the closing tag hasn't arrived yet (streaming), hide the partial reasoning
+    if "</think>" not in text:
+        # Trim everything from the first <think> onwards
+        head = text.split("<think>", 1)[0]
+        return head
+
+    def _replace(match: re.Match) -> str:
+        content = match.group(1).strip()
+        if not show_reasoning:
+            return ""
+        # Use HTML <details> which is generally supported by Markdown renderers
+        # and keep the reasoning in a code fence for safe rendering.
+        return (
+            "<details><summary>Reasoning</summary>\n\n" 
+            "```text\n" + content + "\n```\n"
+            "</details>\n"
+        )
+
+    return pattern.sub(_replace, text)
