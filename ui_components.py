@@ -5,9 +5,9 @@ Contains functions to create different sections of the Gradio interface.
 
 import gradio as gr
 from utils import (
-    DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_PROVIDER,
-    DEFAULT_IMAGE_TO_IMAGE_MODEL, DEFAULT_IMAGE_TO_IMAGE_PROVIDER,
-    DEFAULT_TTS_MODEL, DEFAULT_TTS_PROVIDER,
+    DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_PROVIDER,
+    DEFAULT_IMAGE_TO_IMAGE_MODEL,
+    DEFAULT_TTS_MODEL,
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS, IMAGE_MODEL_PRESETS,
     IMAGE_TO_IMAGE_MODEL_PRESETS, TTS_MODEL_PRESETS, TTS_VOICES, TTS_MODEL_CONFIGS,
     IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS
@@ -49,7 +49,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                 )
                 chat_provider = gr.Dropdown(
                     choices=IMAGE_PROVIDERS,
-                    value="auto",
+                    value=DEFAULT_PROVIDER,
                     label="Provider",
                     interactive=True
                 )
@@ -191,7 +191,7 @@ def create_image_tab(handle_image_generation_fn):
                     )
                     img_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,
-                        value=DEFAULT_IMAGE_PROVIDER,
+                        value=DEFAULT_PROVIDER,
                         label="Provider",
                         interactive=True
                     )
@@ -311,7 +311,7 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
                     )
                     img2img_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,
-                        value=DEFAULT_IMAGE_TO_IMAGE_PROVIDER,
+                        value=DEFAULT_PROVIDER,
                         label="Provider",
                         interactive=True
                     )
@@ -452,7 +452,7 @@ def create_tts_tab(handle_tts_generation_fn):
                     )
                     tts_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,
-                        value=DEFAULT_TTS_PROVIDER,
+                        value=DEFAULT_PROVIDER,
                         label="Provider",
                         interactive=True
                     )
@@ -687,7 +687,7 @@ def create_footer():
     - Supports both fal-ai and replicate providers
     
     **Supported Providers:**
-    - **fal-ai**: High-quality image generation (default for images)
+    - **fal-ai**: High-quality image generation
     - **hf-inference**: Core API with comprehensive model support
     - **cerebras**: High-performance inference 
     - **cohere**: Advanced language models with multilingual support

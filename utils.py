@@ -11,11 +11,11 @@ import requests
 # Configuration constants
 DEFAULT_CHAT_MODEL = "openai/gpt-oss-20b"
 DEFAULT_IMAGE_MODEL = "Qwen/Qwen-Image"
-DEFAULT_IMAGE_PROVIDER = "fal-ai"
 DEFAULT_IMAGE_TO_IMAGE_MODEL = "Qwen/Qwen-Image-Edit"
-DEFAULT_IMAGE_TO_IMAGE_PROVIDER = "fal-ai"
 DEFAULT_TTS_MODEL = "hexgrad/Kokoro-82M"
-DEFAULT_TTS_PROVIDER = "fal-ai"
+
+# Unified default provider used by all non-chat tasks
+DEFAULT_PROVIDER = "auto"
 
 # Chat configuration
 CHAT_CONFIG = {
