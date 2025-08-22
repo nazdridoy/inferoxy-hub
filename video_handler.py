@@ -5,6 +5,8 @@ Handles text-to-video generation with multiple providers.
 
 import os
 import gradio as gr
+import tempfile
+import io
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from huggingface_hub import InferenceClient
 from huggingface_hub.errors import HfHubHTTPError
@@ -86,11 +88,14 @@ def generate_video(
 
         print(f"🎞️ Video: Generation completed! Type: {type(video)}")
 
+        # Convert output to a path or URL Gradio can handle
+        video_output = _coerce_video_output(video)
+
         # Report successful token usage
         if token_id:
             report_token_status(token_id, "success", api_key=proxy_api_key)
 
-        return video, format_success_message("Video generated", f"using {model_name} on {provider}")
+        return video_output, format_success_message("Video generated", f"using {model_name} on {provider}")
 
     except ConnectionError as e:
         error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
@@ -148,5 +153,58 @@ def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guid
         guidance_scale=guidance_val if guidance_val is not None else None,
         seed=seed_val if seed_val is not None else None,
     )
+
+
+def _coerce_video_output(value):
+    """Coerce various return types (bytes, str path/URL, BytesIO) into a filepath/URL for gr.Video."""
+    # Case 1: Direct URL or existing file path
+    if isinstance(value, str):
+        if value.startswith("http://") or value.startswith("https://"):
+            return value
+        if os.path.exists(value):
+            return value
+        # Unknown string; fall through to save as file
+
+    # Case 2: Bytes-like content
+    if isinstance(value, (bytes, bytearray)):
+        data = bytes(value)
+        suffix = _guess_video_suffix(data)
+        return _write_temp_video(data, suffix)
+
+    # Case 3: File-like object
+    if isinstance(value, io.IOBase) or hasattr(value, "read"):
+        try:
+            data = value.read()
+            if isinstance(data, (bytes, bytearray)):
+                suffix = _guess_video_suffix(data)
+                return _write_temp_video(bytes(data), suffix)
+        except Exception:
+            pass
+
+    # Fallback: save string representation for debugging
+    debug_bytes = str(type(value)).encode("utf-8")
+    return _write_temp_video(debug_bytes, ".mp4")
+
+
+def _write_temp_video(data: bytes, suffix: str) -> str:
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    try:
+        tmp.write(data)
+        tmp.flush()
+    finally:
+        tmp.close()
+    return tmp.name
+
+
+def _guess_video_suffix(data: bytes) -> str:
+    header = data[:64]
+    # MP4 often contains 'ftyp' box near start
+    if b"ftyp" in header:
+        return ".mp4"
+    # WebM/Matroska magic number starts with 0x1A45DFA3 and often contains 'webm'
+    if header.startswith(b"\x1aE\xdf\xa3") or b"webm" in header.lower():
+        return ".webm"
+    # Default to mp4
+    return ".mp4"
 
 
