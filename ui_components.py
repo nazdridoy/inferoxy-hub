@@ -52,11 +52,6 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                     lines=2,
                     placeholder="Define the assistant's personality and behavior..."
                 )
-                show_reasoning = gr.Checkbox(
-                    value=False,
-                    label="Show reasoning (<think>…</think>)",
-                    info="Reveal model's reasoning, if present",
-                )
             
             with gr.Column(scale=1):
                 chat_max_tokens = gr.Slider(
@@ -87,7 +82,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         chat_send_event = chat_submit.click(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
-                   chat_max_tokens, chat_temperature, chat_top_p, show_reasoning],
+                   chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
         )
         
@@ -102,7 +97,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         chat_enter_event = chat_input.submit(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
-                   chat_max_tokens, chat_temperature, chat_top_p, show_reasoning],
+                   chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
         )
 
@@ -124,7 +119,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
             chatbot_display.retry(
                 fn=handle_chat_retry_fn,
                 inputs=[chatbot_display, chat_system_message, chat_model_name, 
-                        chat_max_tokens, chat_temperature, chat_top_p, show_reasoning],
+                        chat_max_tokens, chat_temperature, chat_top_p],
                 outputs=chatbot_display
             )
 

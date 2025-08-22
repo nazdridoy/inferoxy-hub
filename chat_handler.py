@@ -168,7 +168,7 @@ def chat_respond(
         yield format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_chat_submit(message, history, system_msg, model_name, max_tokens, temperature, top_p, show_reasoning=False, hf_token: gr.OAuthToken = None):
+def handle_chat_submit(message, history, system_msg, model_name, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None):
     """
     Handle chat submission and manage conversation history with streaming.
     """
@@ -203,13 +203,13 @@ def handle_chat_submit(message, history, system_msg, model_name, max_tokens, tem
     # Stream the assistant response token by token
     assistant_response = ""
     for partial_response in response_generator:
-        assistant_response = render_with_reasoning_toggle(partial_response, bool(show_reasoning))
+        assistant_response = render_with_reasoning_toggle(partial_response, True)
         # Update history with the current partial response and yield it
         current_history = history + [{"role": "assistant", "content": assistant_response}]
         yield current_history, ""
 
 
-def handle_chat_retry(history, system_msg, model_name, max_tokens, temperature, top_p, show_reasoning=False, hf_token: gr.OAuthToken = None, retry_data=None):
+def handle_chat_retry(history, system_msg, model_name, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None, retry_data=None):
     """
     Retry the assistant response for the selected message.
     Works with gr.Chatbot.retry() which provides retry_data.index for the message.
@@ -275,6 +275,6 @@ def handle_chat_retry(history, system_msg, model_name, max_tokens, temperature, 
 
     assistant_response = ""
     for partial_response in response_generator:
-        assistant_response = render_with_reasoning_toggle(partial_response, bool(show_reasoning))
+        assistant_response = render_with_reasoning_toggle(partial_response, True)
         current_history = trimmed_history + [{"role": "assistant", "content": assistant_response}]
         yield current_history
