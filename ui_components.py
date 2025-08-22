@@ -445,7 +445,7 @@ def create_tts_tab(handle_tts_generation_fn):
                 with gr.Group():
                     gr.Markdown("**🤖 Model & Provider**")
                     tts_model_name = gr.Dropdown(
-                        choices=["hexgrad/Kokoro-82M", "ResembleAI/chatterbox"],
+                        choices=["hexgrad/Kokoro-82M", "ResembleAI/chatterbox", "nari-labs/Dia-1.6B"],
                         value=DEFAULT_TTS_MODEL,
                         label="Model",
                         info="Select TTS model"
@@ -518,8 +518,10 @@ def create_tts_tab(handle_tts_generation_fn):
                 return gr.update(visible=True), gr.update(visible=False)
             elif model_name == "ResembleAI/chatterbox":
                 return gr.update(visible=False), gr.update(visible=True)
+            elif model_name == "nari-labs/Dia-1.6B":
+                return gr.update(visible=False), gr.update(visible=False)
             else:
-                return gr.update(visible=True), gr.update(visible=False)
+                return gr.update(visible=False), gr.update(visible=False)
         
         # Connect model change event
         tts_model_name.change(
