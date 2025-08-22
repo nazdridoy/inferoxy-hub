@@ -13,6 +13,7 @@ DEFAULT_CHAT_MODEL = "openai/gpt-oss-20b"
 DEFAULT_IMAGE_MODEL = "Qwen/Qwen-Image"
 DEFAULT_IMAGE_TO_IMAGE_MODEL = "Qwen/Qwen-Image-Edit"
 DEFAULT_TTS_MODEL = "hexgrad/Kokoro-82M"
+DEFAULT_VIDEO_MODEL = "Wan-AI/Wan2.2-T2V-A14B"
 
 # Unified default provider used by all non-chat tasks
 DEFAULT_PROVIDER = "auto"
@@ -118,6 +119,26 @@ TTS_MODEL_CONFIGS = {
         "extra_body_params": []
     }
 }
+
+# -----------------------------
+# Text-to-Video configuration
+# -----------------------------
+
+# Model presets for text-to-video generation
+VIDEO_MODEL_PRESETS = [
+    ("Wan 2.2 (Replicate)", "Wan-AI/Wan2.2-T2V-A14B", "fal-ai"),
+    ("LTX-Video 0.9.7 (Fal.ai)", "Lightricks/LTX-Video-0.9.7-dev", "fal-ai"),
+    ("HunyuanVideo (Auto)", "tencent/HunyuanVideo", "auto"),
+    ("CogVideoX-5b (Fal.ai)", "zai-org/CogVideoX-5b", "fal-ai"),
+]
+
+# Example prompts for text-to-video generation
+VIDEO_EXAMPLE_PROMPTS = [
+    "A young man walking on the street",
+    "A corgi puppy running through a field of flowers, cinematic",
+    "A futuristic city skyline at sunset with flying cars, 4k",
+    "A serene beach with gentle waves and palm trees swaying",
+]
 
 # Voice options for Kokoro TTS (based on the reference app)
 TTS_VOICES = {

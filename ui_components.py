@@ -10,7 +10,8 @@ from utils import (
     DEFAULT_TTS_MODEL,
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS, IMAGE_MODEL_PRESETS,
     IMAGE_TO_IMAGE_MODEL_PRESETS, TTS_MODEL_PRESETS, TTS_VOICES, TTS_MODEL_CONFIGS,
-    IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS
+    IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS,
+    DEFAULT_VIDEO_MODEL, VIDEO_MODEL_PRESETS, VIDEO_EXAMPLE_PROMPTS
 )
 
 
@@ -561,6 +562,126 @@ def create_tts_tab(handle_tts_generation_fn):
         gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
 
 
+def create_video_tab(handle_video_generation_fn):
+    """
+    Create the text-to-video tab interface.
+    """
+    with gr.Tab("🎬 Text-to-Video", id="video"):
+        with gr.Row():
+            with gr.Column(scale=2):
+                # Video output
+                output_video = gr.Video(
+                    label="Generated Video",
+                    interactive=False,
+                    show_download_button=True,
+                    height=480,
+                )
+                status_text = gr.Textbox(
+                    label="Generation Status",
+                    interactive=False,
+                    lines=2
+                )
+
+            with gr.Column(scale=1):
+                # Model and provider inputs
+                with gr.Group():
+                    gr.Markdown("**🤖 Model & Provider**")
+                    vid_model_name = gr.Textbox(
+                        value=DEFAULT_VIDEO_MODEL,
+                        label="Model Name",
+                        placeholder="e.g., tencent/HunyuanVideo, Wan-AI/Wan2.2-T2V-A14B"
+                    )
+                    vid_provider = gr.Dropdown(
+                        choices=IMAGE_PROVIDERS,
+                        value=DEFAULT_PROVIDER,
+                        label="Provider",
+                        interactive=True
+                    )
+
+                # Generation parameters
+                with gr.Group():
+                    gr.Markdown("**📝 Prompt**")
+                    vid_prompt = gr.Textbox(
+                        value=VIDEO_EXAMPLE_PROMPTS[0],
+                        label="Prompt",
+                        lines=3,
+                        placeholder="Describe the video you want to generate..."
+                    )
+
+                with gr.Group():
+                    gr.Markdown("**⚙️ Generation Settings (optional)**")
+                    with gr.Row():
+                        vid_steps = gr.Slider(
+                            minimum=10, maximum=100, value=20, step=1,
+                            label="Inference Steps"
+                        )
+                        vid_guidance = gr.Slider(
+                            minimum=1.0, maximum=20.0, value=7.5, step=0.5,
+                            label="Guidance Scale"
+                        )
+                    vid_seed = gr.Slider(
+                        minimum=-1, maximum=999999, value=-1, step=1,
+                        label="Seed", info="-1 for random"
+                    )
+
+                # Generate and Stop buttons
+                with gr.Row():
+                    generate_btn = gr.Button(
+                        "🎬 Generate Video",
+                        variant="primary",
+                        size="lg",
+                        scale=2
+                    )
+                    stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
+
+                # Quick model presets
+                with gr.Group():
+                    gr.Markdown("**🎯 Popular Presets**")
+                    for name, model, provider in VIDEO_MODEL_PRESETS:
+                        btn = gr.Button(name, size="sm")
+                        btn.click(
+                            lambda m=model, p=provider: (m, p),
+                            outputs=[vid_model_name, vid_provider]
+                        )
+
+        # Examples for video generation
+        with gr.Group():
+            gr.Markdown("**🌟 Example Prompts**")
+            gr.Examples(
+                examples=[[prompt] for prompt in VIDEO_EXAMPLE_PROMPTS],
+                inputs=vid_prompt
+            )
+
+        # Connect video generation events
+        generate_btn.click(
+            fn=lambda: gr.update(visible=True),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            queue=False
+        )
+
+        gen_event = generate_btn.click(
+            fn=handle_video_generation_fn,
+            inputs=[
+                vid_prompt, vid_model_name, vid_provider,
+                vid_steps, vid_guidance, vid_seed
+            ],
+            outputs=[output_video, status_text]
+        )
+
+        # Stop current video generation
+        stop_generate_btn.click(
+            fn=lambda: gr.update(visible=False),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            cancels=[gen_event],
+            queue=False
+        )
+
+        # Hide stop after generation completes
+        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+
+
 def create_image_to_image_presets(img2img_model_name, img2img_provider):
     """Create quick model presets for image-to-image generation."""
     with gr.Group():
@@ -645,13 +766,14 @@ def create_main_header():
     gr.Markdown("""
     # 🚀 HF-Inferoxy AI Hub
     
-    A comprehensive AI platform combining chat, image generation, and text-to-speech capabilities with intelligent token management through HF-Inferoxy.
+    A comprehensive AI platform combining chat, image generation, image-to-image, text-to-video, and text-to-speech capabilities with intelligent token management through HF-Inferoxy.
     
     **Features:**
     - 💬 **Smart Chat**: Conversational AI with streaming responses
     - 🎨 **Image Generation**: Text-to-image creation with multiple providers  
     - 🖼️ **Image-to-Image**: Transform and modify existing images with AI
-    - 🎤 **Text-to-Speech**: Convert text to natural-sounding speech with Kokoro
+    - 🎬 **Text-to-Video**: Generate short videos from text prompts
+    - 🎤 **Text-to-Speech**: Convert text to natural-sounding speech
     - 🔄 **Intelligent Token Management**: Automatic token rotation and error handling
     - 🌐 **Multi-Provider Support**: Works with HF Inference, Cerebras, Cohere, Groq, Together, Fal.ai, and more
     """)
@@ -680,6 +802,11 @@ def create_footer():
     - Use negative prompts to avoid unwanted modifications
     - Perfect for style transfers, object additions, and image transformations
     - Works great with models like Qwen Image Edit and FLUX.1 Kontext
+    
+    **Text-to-Video Tab:**
+    - Write a concise prompt describing the motion you want
+    - Choose a model and provider (default: `auto`)
+    - Some models may take several minutes to render
     
     **Text-to-Speech Tab:**
     - Enter text you want to convert to speech
