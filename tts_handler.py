@@ -4,6 +4,7 @@ Handles text-to-speech generation with multiple providers.
 """
 
 import os
+import gradio as gr
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
@@ -16,7 +17,9 @@ from utils import (
     validate_proxy_key, 
     format_error_message, 
     format_success_message,
-    TTS_MODEL_CONFIGS
+    TTS_MODEL_CONFIGS,
+    check_org_access,
+    format_access_denied_message
 )
 
 # Timeout configuration for TTS generation
@@ -153,7 +156,7 @@ def generate_text_to_speech(
         return None, format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_val, speed_val, audio_url_val, exaggeration_val, temperature_val, cfg_val):
+def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_val, speed_val, audio_url_val, exaggeration_val, temperature_val, cfg_val, hf_token: gr.OAuthToken = None):
     """
     Handle text-to-speech generation request with validation.
     """
@@ -164,6 +167,12 @@ def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_va
     # Limit text length to prevent timeouts
     if len(text_val) > 5000:
         return None, format_error_message("Validation Error", "Text is too long. Please keep it under 5000 characters.")
+    
+    # Enforce org-based access control via HF OAuth token
+    access_token = getattr(hf_token, "token", None) if hf_token is not None else None
+    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    if not is_allowed:
+        return None, format_access_denied_message(access_msg)
     
     # Generate speech
     return generate_text_to_speech(

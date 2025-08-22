@@ -4,6 +4,7 @@ Handles text-to-image generation with multiple providers.
 """
 
 import os
+import gradio as gr
 import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
@@ -15,7 +16,9 @@ from utils import (
     IMAGE_CONFIG, 
     validate_proxy_key, 
     format_error_message, 
-    format_success_message
+    format_success_message,
+    check_org_access,
+    format_access_denied_message
 )
 
 # Timeout configuration for image generation
@@ -276,13 +279,19 @@ def generate_image_to_image(
         return None, format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_image_to_image_generation(input_image_val, prompt_val, model_val, provider_val, negative_prompt_val, steps_val, guidance_val, seed_val):
+def handle_image_to_image_generation(input_image_val, prompt_val, model_val, provider_val, negative_prompt_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None):
     """
     Handle image-to-image generation request with validation.
     """
     # Validate input image
     if input_image_val is None:
         return None, format_error_message("Validation Error", "Please upload an input image")
+    
+    # Enforce org-based access control via HF OAuth token
+    access_token = getattr(hf_token, "token", None) if hf_token is not None else None
+    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    if not is_allowed:
+        return None, format_access_denied_message(access_msg)
     
     # Generate image-to-image
     return generate_image_to_image(
@@ -297,7 +306,7 @@ def handle_image_to_image_generation(input_image_val, prompt_val, model_val, pro
     )
 
 
-def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt_val, width_val, height_val, steps_val, guidance_val, seed_val):
+def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt_val, width_val, height_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None):
     """
     Handle image generation request with validation.
     """
@@ -305,6 +314,12 @@ def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt
     is_valid, error_msg = validate_dimensions(width_val, height_val)
     if not is_valid:
         return None, format_error_message("Validation Error", error_msg)
+    
+    # Enforce org-based access control via HF OAuth token
+    access_token = getattr(hf_token, "token", None) if hf_token is not None else None
+    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    if not is_allowed:
+        return None, format_access_denied_message(access_msg)
     
     # Generate image
     return generate_image(

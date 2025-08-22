@@ -23,6 +23,9 @@ def create_app():
     
     # Create the main Gradio interface with tabs
     with gr.Blocks(title="HF-Inferoxy AI Hub", theme=get_gradio_theme()) as demo:
+        # Sidebar with HF OAuth login/logout
+        with gr.Sidebar():
+            gr.LoginButton()
         
         # Main header
         create_main_header()

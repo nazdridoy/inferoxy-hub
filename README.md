@@ -6,6 +6,7 @@ colorTo: blue
 sdk: gradio
 app_file: app.py
 pinned: false
+hf_oauth: true
 ---
 
 # 🚀 HF-Inferoxy AI Hub
@@ -43,6 +44,9 @@ Add the following secrets to your HuggingFace Space:
 
 - **Key**: `PROXY_URL`
 - **Value**: Your HF-Inferoxy proxy server URL (e.g., `https://hf-proxy.example.com`)
+
+- **Key**: `ALLOWED_ORGS`
+- **Value**: Comma- or space-separated list of org names allowed to use this Space (e.g., `acme, acme-research`)
 
 ### 2. HF-Inferoxy Server
 
@@ -239,6 +243,11 @@ Prompt: "Help me debug this Python code: [paste code]"
 ```
 
 ## 🔒 Security & Authentication
+
+### Hugging Face OAuth (no inference scope)
+- Login is required. The app uses Hugging Face OAuth and automatically injects an access token.
+- We do not request the `inference-api` scope; the token is used only to call `whoami-v2` to verify org membership.
+- Inference calls continue to use tokens provisioned by your HF-Inferoxy proxy.
 
 ### RBAC System
 - All operations require authentication with the HF-Inferoxy proxy server
