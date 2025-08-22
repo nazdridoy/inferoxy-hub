@@ -783,50 +783,33 @@ def create_footer():
     """Create the footer with helpful information."""
     gr.Markdown("""
     ---
-    ### 📚 How to Use
+    ### 📚 Quick Guide
     
-    **Chat Tab:**
-    - Enter your message and customize the AI's behavior with system messages
-    - Enter model and select provider from the dropdown (default: `auto`)
-    - Adjust temperature for creativity and top-p for response diversity
+    **Chat**
+    - Type a message, pick a model, set provider (defaults to `auto`).
+    - Tune system message, temperature, top‑p, and max new tokens.
     
-    **Image Tab:**
-    - Write detailed prompts describing your desired image
-    - Use negative prompts to avoid unwanted elements  
-    - Experiment with different models and providers for varied styles
-    - Higher inference steps = better quality but slower generation
+    **Image**
+    - Write a prompt and select model/provider.
+    - Optional: width/height (÷8), steps, guidance, seed, negative prompt.
     
-    **Image-to-Image Tab:**
-    - Upload an input image you want to modify
-    - Describe the changes you want to make to the image
-    - Use negative prompts to avoid unwanted modifications
-    - Perfect for style transfers, object additions, and image transformations
-    - Works great with models like Qwen Image Edit and FLUX.1 Kontext
+    **Image‑to‑Image**
+    - Upload an input image and describe the change you want.
+    - Use the same settings as Image for quality and control.
     
-    **Text-to-Video Tab:**
-    - Write a concise prompt describing the motion you want
-    - Choose a model and provider (default: `auto`)
-    - Some models may take several minutes to render
+    **Video**
+    - Provide a short motion prompt; optionally set steps, guidance, and seed.
     
-    **Text-to-Speech Tab:**
-    - Enter text you want to convert to speech
-    - Choose from various English voices (US and UK accents)
-    - Adjust speed from 0.5x to 2.0x
-    - Powered by Kokoro TTS model for natural-sounding speech
-    - Supports both fal-ai and replicate providers
+    **Text‑to‑Speech**
+    - Enter text, choose a TTS model, and adjust voice/style if available.
     
-    **Supported Providers:**
-    - **fal-ai**: High-quality image generation
-    - **hf-inference**: Core API with comprehensive model support
-    - **cerebras**: High-performance inference 
-    - **cohere**: Advanced language models with multilingual support
-    - **groq**: Ultra-fast inference, optimized for speed
-    - **together**: Collaborative AI hosting, wide model support
-    - **nebius**: Cloud-native services with enterprise features
-    - **nscale**: Optimized inference performance 
-    - **replicate**: Collaborative AI hosting
+    **Providers**
+    - Default is `auto`. You can choose from providers available via your HF‑Inferoxy setup.
     
-    **Built with ❤️ using [HF-Inferoxy](https://nazdridoy.github.io/hf-inferoxy/) for intelligent token management**
+    **Docs**
+    - HF‑Inferoxy: https://nazdridoy.github.io/hf-inferoxy/
+    
+    Built with HF‑Inferoxy for secure token management and provider routing.
     """)
 
 
