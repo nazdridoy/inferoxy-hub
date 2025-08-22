@@ -44,7 +44,14 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                 chat_model_name = gr.Textbox(
                     value=DEFAULT_CHAT_MODEL,
                     label="Model Name",
-                    placeholder="e.g., openai/gpt-oss-20b or openai/gpt-oss-20b:fireworks-ai"
+                    placeholder="e.g., openai/gpt-oss-20b (provider via dropdown)",
+                    info="Do not include :provider in model name"
+                )
+                chat_provider = gr.Dropdown(
+                    choices=IMAGE_PROVIDERS,
+                    value="auto",
+                    label="Provider",
+                    interactive=True
                 )
                 chat_system_message = gr.Textbox(
                     value=CHAT_CONFIG["system_message"],
@@ -82,7 +89,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         chat_send_event = chat_submit.click(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
-                   chat_max_tokens, chat_temperature, chat_top_p],
+                   chat_provider, chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
         )
         
@@ -97,7 +104,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         chat_enter_event = chat_input.submit(
             fn=handle_chat_submit_fn,
             inputs=[chat_input, chatbot_display, chat_system_message, chat_model_name, 
-                   chat_max_tokens, chat_temperature, chat_top_p],
+                   chat_provider, chat_max_tokens, chat_temperature, chat_top_p],
             outputs=[chatbot_display, chat_input]
         )
 
@@ -119,7 +126,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
             chatbot_display.retry(
                 fn=handle_chat_retry_fn,
                 inputs=[chatbot_display, chat_system_message, chat_model_name, 
-                        chat_max_tokens, chat_temperature, chat_top_p],
+                        chat_provider, chat_max_tokens, chat_temperature, chat_top_p],
                 outputs=chatbot_display
             )
 
@@ -132,8 +139,8 @@ def create_chat_tips():
             ### 💡 Chat Tips
             
             **Model Format:**
-            - Single model: `openai/gpt-oss-20b` (uses auto provider)
-            - With provider: `openai/gpt-oss-20b:fireworks-ai`
+            - Model only: `openai/gpt-oss-20b`
+            - Select provider via the Provider dropdown (default: `auto`)
             
             **Popular Models:**
             - `openai/gpt-oss-20b` - Fast general purpose
@@ -146,16 +153,10 @@ def create_chat_tips():
             gr.Markdown("""
             ### 🚀 Popular Providers
             
-            - **auto** - Let HF choose best provider (default)
-            - **fireworks-ai** - Fast and reliable
-            - **cerebras** - High performance
-            - **groq** - Ultra-fast inference  
-            - **together** - Wide model support
-            - **cohere** - Advanced language models
+            - Select from dropdown. Default is **auto**.
             
-            **Examples:**
-            - `openai/gpt-oss-20b` (auto provider)
-            - `openai/gpt-oss-20b:fireworks-ai` (specific provider)
+            **Example:**
+            - Model: `openai/gpt-oss-20b`, Provider: `groq`
             """)
 
 
@@ -662,7 +663,7 @@ def create_footer():
     
     **Chat Tab:**
     - Enter your message and customize the AI's behavior with system messages
-    - Choose models and providers using the format `model:provider` 
+    - Enter model and select provider from the dropdown (default: `auto`)
     - Adjust temperature for creativity and top-p for response diversity
     
     **Image Tab:**

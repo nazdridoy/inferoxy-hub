@@ -14,7 +14,6 @@ from requests.exceptions import ConnectionError, Timeout, RequestException
 from hf_token_utils import get_proxy_token, report_token_status
 from utils import (
     validate_proxy_key, 
-    parse_model_and_provider, 
     format_error_message,
     check_org_access,
     format_access_denied_message,
@@ -30,6 +29,7 @@ def chat_respond(
     history: list[dict[str, str]],
     system_message,
     model_name,
+    provider_override,
     max_tokens,
     temperature,
     top_p,
@@ -52,8 +52,9 @@ def chat_respond(
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ Chat: Got token: {token_id}")
         
-        # Parse model name and provider if specified
-        model, provider = parse_model_and_provider(model_name)
+        # Enforce explicit provider selection via dropdown
+        model = model_name
+        provider = provider_override or "auto"
         
         print(f"🤖 Chat: Using model='{model}', provider='{provider if provider else 'auto'}'")
         
@@ -168,14 +169,14 @@ def chat_respond(
         yield format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_chat_submit(message, history, system_msg, model_name, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None):
+def handle_chat_submit(message, history, system_msg, model_name, provider, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None):
     """
     Handle chat submission and manage conversation history with streaming.
     """
     if not message.strip():
         yield history, ""
         return
-    
+
     # Enforce org-based access control via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
     is_allowed, access_msg, _username, _matched = check_org_access(access_token)
@@ -194,7 +195,8 @@ def handle_chat_submit(message, history, system_msg, model_name, max_tokens, tem
         message, 
         history[:-1],  # Don't include the current message in history for the function
         system_msg, 
-        model_name, 
+        model_name,
+        provider,
         max_tokens, 
         temperature, 
         top_p
@@ -209,7 +211,7 @@ def handle_chat_submit(message, history, system_msg, model_name, max_tokens, tem
         yield current_history, ""
 
 
-def handle_chat_retry(history, system_msg, model_name, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None, retry_data=None):
+def handle_chat_retry(history, system_msg, model_name, provider, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None, retry_data=None):
     """
     Retry the assistant response for the selected message.
     Works with gr.Chatbot.retry() which provides retry_data.index for the message.
@@ -268,6 +270,7 @@ def handle_chat_retry(history, system_msg, model_name, max_tokens, temperature, 
         prior_history,
         system_msg,
         model_name,
+        provider,
         max_tokens,
         temperature,
         top_p

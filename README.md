@@ -70,7 +70,7 @@ The app requires:
 4. **Automatic Rotation**: HF-Inferoxy handles token rotation and error management
 
 ### Chat Assistant
-1. **Model Selection**: Choose any HuggingFace model with optional provider specification
+1. **Model Selection**: Choose any HuggingFace model and select a provider from the dropdown (default: Auto)
 2. **Conversation**: Engage in natural conversations with streaming responses
 3. **Customization**: Adjust the AI's personality with system messages and parameters
 
@@ -123,15 +123,10 @@ The application automatically works with all Hugging Face inference providers:
 
 ### 💡 How It Works
 
-1. **Model Format**: Use `model_name` or `model_name:provider` format
-2. **Auto Provider**: When no provider is specified, HF-Inferoxy automatically selects the best available provider
+1. **Model Format**: Enter the model name only (e.g., `openai/gpt-oss-20b`)
+2. **Provider**: Select the provider from the dropdown (default: Auto)
 3. **Fallback System**: If one provider fails, the system automatically tries alternatives
 4. **Token Management**: HF-Inferoxy handles token rotation and quota management automatically
-
-**Examples:**
-- `openai/gpt-oss-20b` (auto provider selection)
-- `openai/gpt-oss-20b:fireworks-ai` (specific provider)
-- `Qwen/Qwen-Image:fal-ai` (image model with specific provider)
 
 ## 🎨 Usage Examples
 
@@ -147,9 +142,11 @@ The application automatically works with all Hugging Face inference providers:
 ```
 # Auto provider (default - let HF choose best)
 Model Name: openai/gpt-oss-20b
+Provider: auto
 
 # Specific provider
-Model Name: openai/gpt-oss-20b:fireworks-ai
+Model Name: openai/gpt-oss-20b
+Provider: fireworks-ai
 System Message: You are a helpful coding assistant specializing in Python.
 ```
 
@@ -223,10 +220,12 @@ System Message: You are a helpful coding assistant specializing in Python.
 ```
 # Using auto provider (default)
 Model: openai/gpt-oss-20b
+Provider: auto
 Prompt: "Explain quantum computing in simple terms"
 
 # Using specific provider
-Model: openai/gpt-oss-20b:fireworks-ai  
+Model: openai/gpt-oss-20b
+Provider: fireworks-ai
 Prompt: "Help me debug this Python code: [paste code]"
 
 # Other example prompts:

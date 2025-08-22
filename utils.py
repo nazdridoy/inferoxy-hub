@@ -35,9 +35,28 @@ IMAGE_CONFIG = {
     "negative_prompt": "blurry, low quality, distorted, deformed, ugly, bad anatomy"
 }
 
-# Supported providers
-CHAT_PROVIDERS = ["auto", "fireworks-ai", "cerebras", "groq", "together", "cohere"]
-IMAGE_PROVIDERS = ["hf-inference", "fal-ai", "nebius", "nscale", "replicate", "together"]
+# Supported providers (unified across tasks)
+PROVIDERS_UNIFIED = [
+    "auto",
+    "cerebras",
+    "cohere",
+    "fal-ai",
+    "featherless-ai",
+    "fireworks-ai",
+    "groq",
+    "hf-inference",
+    "hyperbolic",
+    "nebius",
+    "novita",
+    "nscale",
+    "replicate",
+    "sambanova",
+    "together",
+]
+
+# Backwards compatibility exported lists
+CHAT_PROVIDERS = PROVIDERS_UNIFIED
+IMAGE_PROVIDERS = PROVIDERS_UNIFIED
 
 # Popular models for quick access
 POPULAR_CHAT_MODELS = [
@@ -196,16 +215,6 @@ def validate_proxy_url():
     return True, ""
 
 
-def parse_model_and_provider(model_name):
-    """
-    Parse model name and provider from a string like 'model:provider'.
-    Returns (model, provider) tuple. Provider is None if not specified.
-    """
-    if ":" in model_name:
-        model, provider = model_name.split(":", 1)
-        return model, provider
-    else:
-        return model_name, None
 
 
 def format_error_message(error_type, error_message):
