@@ -72,7 +72,24 @@ IMAGE_TO_IMAGE_MODEL_PRESETS = [
 TTS_MODEL_PRESETS = [
     ("Kokoro (Fal.ai)", "hexgrad/Kokoro-82M", "fal-ai"),
     ("Kokoro (Replicate)", "hexgrad/Kokoro-82M", "replicate"),
+    ("Chatterbox (Fal.ai)", "ResembleAI/chatterbox", "fal-ai"),
 ]
+
+# Model-specific configurations for TTS
+TTS_MODEL_CONFIGS = {
+    "hexgrad/Kokoro-82M": {
+        "type": "kokoro",
+        "supports_voice": True,
+        "supports_speed": True,
+        "extra_body_params": ["voice", "speed"]
+    },
+    "ResembleAI/chatterbox": {
+        "type": "chatterbox", 
+        "supports_voice": False,
+        "supports_speed": False,
+        "extra_body_params": ["audio_url", "exaggeration", "temperature", "cfg"]
+    }
+}
 
 # Voice options for Kokoro TTS (based on the reference app)
 TTS_VOICES = {
@@ -140,6 +157,14 @@ TTS_EXAMPLE_TEXTS = [
     "Science is not only compatible with spirituality; it is a profound source of spirituality.",
     "The only way to do great work is to love what you do. If you haven't found it yet, keep looking.",
     "Life is what happens when you're busy making other plans. Embrace every moment with gratitude."
+]
+
+# Example audio URLs for Chatterbox TTS
+TTS_EXAMPLE_AUDIO_URLS = [
+    "https://github.com/nazdridoy/kokoro-tts/raw/main/previews/demo.mp3",
+    "https://huggingface.co/datasets/hf-internal-testing/fixtures/resolve/main/audio/sample_audio_1.mp3",
+    "https://huggingface.co/datasets/hf-internal-testing/fixtures/resolve/main/audio/sample_audio_2.mp3",
+    "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
 ]
 
 

@@ -9,8 +9,8 @@ from utils import (
     DEFAULT_IMAGE_TO_IMAGE_MODEL, DEFAULT_IMAGE_TO_IMAGE_PROVIDER,
     DEFAULT_TTS_MODEL, DEFAULT_TTS_PROVIDER,
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS, IMAGE_MODEL_PRESETS,
-    IMAGE_TO_IMAGE_MODEL_PRESETS, TTS_MODEL_PRESETS, TTS_VOICES,
-    IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS
+    IMAGE_TO_IMAGE_MODEL_PRESETS, TTS_MODEL_PRESETS, TTS_VOICES, TTS_MODEL_CONFIGS,
+    IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS
 )
 
 
@@ -412,7 +412,7 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
 
 def create_tts_tab(handle_tts_generation_fn):
     """
-    Create the text-to-speech tab interface.
+    Create the text-to-speech tab interface with dynamic model-specific settings.
     """
     with gr.Tab("🎤 Text-to-Speech", id="tts"):
         with gr.Row():
@@ -430,7 +430,7 @@ def create_tts_tab(handle_tts_generation_fn):
                     label="Generated Audio",
                     type="numpy",
                     interactive=False,
-                    autoplay=False,
+                    autoplay=True,
                     show_download_button=True
                 )
                 status_text = gr.Textbox(
@@ -443,10 +443,11 @@ def create_tts_tab(handle_tts_generation_fn):
                 # Model and provider inputs
                 with gr.Group():
                     gr.Markdown("**🤖 Model & Provider**")
-                    tts_model_name = gr.Textbox(
+                    tts_model_name = gr.Dropdown(
+                        choices=["hexgrad/Kokoro-82M", "ResembleAI/chatterbox"],
                         value=DEFAULT_TTS_MODEL,
-                        label="Model Name",
-                        placeholder="e.g., hexgrad/Kokoro-82M"
+                        label="Model",
+                        info="Select TTS model"
                     )
                     tts_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,
@@ -455,9 +456,9 @@ def create_tts_tab(handle_tts_generation_fn):
                         interactive=True
                     )
                 
-                # Voice and speed settings
-                with gr.Group():
-                    gr.Markdown("**🎤 Voice Settings**")
+                # Kokoro-specific settings (initially visible)
+                with gr.Group(visible=True) as kokoro_settings:
+                    gr.Markdown("**🎤 Kokoro Voice Settings**")
                     tts_voice = gr.Dropdown(
                         choices=list(TTS_VOICES.items()),
                         value="af_bella",
@@ -467,6 +468,28 @@ def create_tts_tab(handle_tts_generation_fn):
                     tts_speed = gr.Slider(
                         minimum=0.5, maximum=2.0, value=1.0, step=0.1,
                         label="Speed", info="0.5 = slow, 2.0 = fast"
+                    )
+                
+                # Chatterbox-specific settings (initially hidden)
+                with gr.Group(visible=False) as chatterbox_settings:
+                    gr.Markdown("**🎭 Chatterbox Style Settings**")
+                    tts_audio_url = gr.Textbox(
+                        value=TTS_EXAMPLE_AUDIO_URLS[0],
+                        label="Reference Audio URL",
+                        placeholder="Enter URL to reference audio file",
+                        info="Audio file to match style and tone"
+                    )
+                    tts_exaggeration = gr.Slider(
+                        minimum=0.0, maximum=1.0, value=0.25, step=0.05,
+                        label="Exaggeration", info="How much to exaggerate the style"
+                    )
+                    tts_temperature = gr.Slider(
+                        minimum=0.0, maximum=1.0, value=0.7, step=0.1,
+                        label="Temperature", info="Creativity level"
+                    )
+                    tts_cfg = gr.Slider(
+                        minimum=0.0, maximum=1.0, value=0.5, step=0.1,
+                        label="CFG", info="Guidance strength"
                     )
                 
                 # Generate and Stop buttons
@@ -484,6 +507,25 @@ def create_tts_tab(handle_tts_generation_fn):
         
         # Examples for TTS generation
         create_tts_examples(tts_text)
+
+        # Create Chatterbox audio URL examples
+        create_chatterbox_examples(tts_audio_url)
+        
+        # Model change handler to show/hide appropriate settings
+        def on_model_change(model_name):
+            if model_name == "hexgrad/Kokoro-82M":
+                return gr.update(visible=True), gr.update(visible=False)
+            elif model_name == "ResembleAI/chatterbox":
+                return gr.update(visible=False), gr.update(visible=True)
+            else:
+                return gr.update(visible=True), gr.update(visible=False)
+        
+        # Connect model change event
+        tts_model_name.change(
+            fn=on_model_change,
+            inputs=[tts_model_name],
+            outputs=[kokoro_settings, chatterbox_settings]
+        )
         
         # Connect TTS generation events
         # Show stop immediately when starting generation
@@ -497,7 +539,8 @@ def create_tts_tab(handle_tts_generation_fn):
         gen_event = generate_btn.click(
             fn=handle_tts_generation_fn,
             inputs=[
-                tts_text, tts_model_name, tts_provider, tts_voice, tts_speed
+                tts_text, tts_model_name, tts_provider, tts_voice, tts_speed,
+                tts_audio_url, tts_exaggeration, tts_temperature, tts_cfg
             ],
             outputs=[output_audio, status_text]
         )
@@ -558,6 +601,16 @@ def create_tts_examples(tts_text):
         tts_examples = gr.Examples(
             examples=[[text] for text in TTS_EXAMPLE_TEXTS],
             inputs=tts_text
+        )
+
+
+def create_chatterbox_examples(tts_audio_url):
+    """Create example audio URLs for Chatterbox TTS."""
+    with gr.Group():
+        gr.Markdown("**🎵 Example Reference Audio URLs**")
+        chatterbox_examples = gr.Examples(
+            examples=[[url] for url in TTS_EXAMPLE_AUDIO_URLS],
+            inputs=tts_audio_url
         )
 
 

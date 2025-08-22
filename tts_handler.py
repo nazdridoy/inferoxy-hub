@@ -15,7 +15,8 @@ from utils import (
     IMAGE_CONFIG, 
     validate_proxy_key, 
     format_error_message, 
-    format_success_message
+    format_success_message,
+    TTS_MODEL_CONFIGS
 )
 
 # Timeout configuration for TTS generation
@@ -26,8 +27,12 @@ def generate_text_to_speech(
     text: str,
     model_name: str,
     provider: str,
-    voice: str = "am_eric",
+    voice: str = "af_bella",
     speed: float = 1.0,
+    audio_url: str = "",
+    exaggeration: float = 0.25,
+    temperature: float = 0.7,
+    cfg: float = 0.5,
 ):
     """
     Generate speech from text using the specified model and provider through HF-Inferoxy.
@@ -56,15 +61,30 @@ def generate_text_to_speech(
         
         print(f"🚀 TTS: Client created, preparing generation params...")
         
+        # Get model configuration
+        model_config = TTS_MODEL_CONFIGS.get(model_name, {})
+        extra_body_params = model_config.get("extra_body_params", [])
+        
         # Prepare generation parameters
         generation_params = {
             "text": text,
             "model": model_name,
-            "extra_body": {
-                "voice": voice,
-                "speed": speed
-            }
+            "extra_body": {}
         }
+        
+        # Add model-specific parameters to extra_body
+        if "voice" in extra_body_params:
+            generation_params["extra_body"]["voice"] = voice
+        if "speed" in extra_body_params:
+            generation_params["extra_body"]["speed"] = speed
+        if "audio_url" in extra_body_params:
+            generation_params["extra_body"]["audio_url"] = audio_url
+        if "exaggeration" in extra_body_params:
+            generation_params["extra_body"]["exaggeration"] = exaggeration
+        if "temperature" in extra_body_params:
+            generation_params["extra_body"]["temperature"] = temperature
+        if "cfg" in extra_body_params:
+            generation_params["extra_body"]["cfg"] = cfg
         
         print(f"📡 TTS: Making generation request with {TTS_GENERATION_TIMEOUT}s timeout...")
         
@@ -133,7 +153,7 @@ def generate_text_to_speech(
         return None, format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_val, speed_val):
+def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_val, speed_val, audio_url_val, exaggeration_val, temperature_val, cfg_val):
     """
     Handle text-to-speech generation request with validation.
     """
@@ -151,5 +171,9 @@ def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_va
         model_name=model_val,
         provider=provider_val,
         voice=voice_val,
-        speed=speed_val
+        speed=speed_val,
+        audio_url=audio_url_val,
+        exaggeration=exaggeration_val,
+        temperature=temperature_val,
+        cfg=cfg_val
     )
