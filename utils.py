@@ -12,6 +12,8 @@ DEFAULT_IMAGE_MODEL = "Qwen/Qwen-Image"
 DEFAULT_IMAGE_PROVIDER = "fal-ai"
 DEFAULT_IMAGE_TO_IMAGE_MODEL = "Qwen/Qwen-Image-Edit"
 DEFAULT_IMAGE_TO_IMAGE_PROVIDER = "fal-ai"
+DEFAULT_TTS_MODEL = "hexgrad/Kokoro-82M"
+DEFAULT_TTS_PROVIDER = "fal-ai"
 
 # Chat configuration
 CHAT_CONFIG = {
@@ -66,6 +68,44 @@ IMAGE_TO_IMAGE_MODEL_PRESETS = [
     ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
 ]
 
+# Model presets for text-to-speech generation
+TTS_MODEL_PRESETS = [
+    ("Kokoro (Fal.ai)", "hexgrad/Kokoro-82M", "fal-ai"),
+    ("Kokoro (Replicate)", "hexgrad/Kokoro-82M", "replicate"),
+]
+
+# Voice options for Kokoro TTS (based on the reference app)
+TTS_VOICES = {
+    '🇺🇸 🚺 Heart ❤️': 'af_heart',
+    '🇺🇸 🚺 Bella 🔥': 'af_bella',
+    '🇺🇸 🚺 Nicole 🎧': 'af_nicole',
+    '🇺🇸 🚺 Aoede': 'af_aoede',
+    '🇺🇸 🚺 Kore': 'af_kore',
+    '🇺🇸 🚺 Sarah': 'af_sarah',
+    '🇺🇸 🚺 Nova': 'af_nova',
+    '🇺🇸 🚺 Sky': 'af_sky',
+    '🇺🇸 🚺 Alloy': 'af_alloy',
+    '🇺🇸 🚺 Jessica': 'af_jessica',
+    '🇺🇸 🚺 River': 'af_river',
+    '🇺🇸 🚹 Michael': 'am_michael',
+    '🇺🇸 🚹 Fenrir': 'am_fenrir',
+    '🇺🇸 🚹 Puck': 'am_puck',
+    '🇺🇸 🚹 Echo': 'am_echo',
+    '🇺🇸 🚹 Eric': 'am_eric',
+    '🇺🇸 🚹 Liam': 'am_liam',
+    '🇺🇸 🚹 Onyx': 'am_onyx',
+    '🇺🇸 🚹 Santa': 'am_santa',
+    '🇺🇸 🚹 Adam': 'am_adam',
+    '🇬🇧 🚺 Emma': 'bf_emma',
+    '🇬🇧 🚺 Isabella': 'bf_isabella',
+    '🇬🇧 🚺 Alice': 'bf_alice',
+    '🇬🇧 🚺 Lily': 'bf_lily',
+    '🇬🇧 🚹 George': 'bm_george',
+    '🇬🇧 🚹 Fable': 'bm_fable',
+    '🇬🇧 🚹 Lewis': 'bm_lewis',
+    '🇬🇧 🚹 Daniel': 'bm_daniel',
+}
+
 # Example prompts for image generation
 IMAGE_EXAMPLE_PROMPTS = [
     "A majestic dragon flying over a medieval castle, epic fantasy art, detailed, 8k",
@@ -88,6 +128,18 @@ IMAGE_TO_IMAGE_EXAMPLE_PROMPTS = [
     "Make the flowers bloom and add butterflies around them",
     "Change the weather to a stormy night with lightning",
     "Add a magical portal in the background with sparkles"
+]
+
+# Example texts for text-to-speech generation
+TTS_EXAMPLE_TEXTS = [
+    "Hello! Welcome to the amazing world of AI-powered text-to-speech technology.",
+    "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the alphabet.",
+    "In a world where technology advances at lightning speed, artificial intelligence continues to reshape our future.",
+    "Imagine a world where machines can understand and respond to human emotions with perfect clarity.",
+    "The future belongs to those who believe in the beauty of their dreams and have the courage to pursue them.",
+    "Science is not only compatible with spirituality; it is a profound source of spirituality.",
+    "The only way to do great work is to love what you do. If you haven't found it yet, keep looking.",
+    "Life is what happens when you're busy making other plans. Embrace every moment with gratitude."
 ]
 
 

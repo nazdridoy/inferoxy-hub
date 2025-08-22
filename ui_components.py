@@ -7,8 +7,10 @@ import gradio as gr
 from utils import (
     DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_PROVIDER,
     DEFAULT_IMAGE_TO_IMAGE_MODEL, DEFAULT_IMAGE_TO_IMAGE_PROVIDER,
+    DEFAULT_TTS_MODEL, DEFAULT_TTS_PROVIDER,
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS, IMAGE_MODEL_PRESETS,
-    IMAGE_TO_IMAGE_MODEL_PRESETS, IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS
+    IMAGE_TO_IMAGE_MODEL_PRESETS, TTS_MODEL_PRESETS, TTS_VOICES,
+    IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS
 )
 
 
@@ -408,6 +410,110 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
         gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
 
 
+def create_tts_tab(handle_tts_generation_fn):
+    """
+    Create the text-to-speech tab interface.
+    """
+    with gr.Tab("🎤 Text-to-Speech", id="tts"):
+        with gr.Row():
+            with gr.Column(scale=2):
+                # Text input
+                tts_text = gr.Textbox(
+                    value=TTS_EXAMPLE_TEXTS[0],  # Use first example as default
+                    label="Text to Convert",
+                    lines=6,
+                    placeholder="Enter the text you want to convert to speech..."
+                )
+                
+                # Audio output
+                output_audio = gr.Audio(
+                    label="Generated Audio",
+                    type="numpy",
+                    interactive=False,
+                    autoplay=True
+                )
+                status_text = gr.Textbox(
+                    label="Generation Status",
+                    interactive=False,
+                    lines=2
+                )
+            
+            with gr.Column(scale=1):
+                # Model and provider inputs
+                with gr.Group():
+                    gr.Markdown("**🤖 Model & Provider**")
+                    tts_model_name = gr.Textbox(
+                        value=DEFAULT_TTS_MODEL,
+                        label="Model Name",
+                        placeholder="e.g., hexgrad/Kokoro-82M"
+                    )
+                    tts_provider = gr.Dropdown(
+                        choices=IMAGE_PROVIDERS,
+                        value=DEFAULT_TTS_PROVIDER,
+                        label="Provider",
+                        interactive=True
+                    )
+                
+                # Voice and speed settings
+                with gr.Group():
+                    gr.Markdown("**🎤 Voice Settings**")
+                    tts_voice = gr.Dropdown(
+                        choices=list(TTS_VOICES.items()),
+                        value="am_eric",
+                        label="Voice",
+                        info="Choose from various English voices"
+                    )
+                    tts_speed = gr.Slider(
+                        minimum=0.5, maximum=2.0, value=1.0, step=0.1,
+                        label="Speed", info="0.5 = slow, 2.0 = fast"
+                    )
+                
+                # Generate and Stop buttons
+                with gr.Row():
+                    generate_btn = gr.Button(
+                        "🎤 Generate Speech", 
+                        variant="primary", 
+                        size="lg",
+                        scale=2
+                    )
+                    stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
+                
+                # Quick model presets
+                create_tts_presets(tts_model_name, tts_provider)
+        
+        # Examples for TTS generation
+        create_tts_examples(tts_text)
+        
+        # Connect TTS generation events
+        # Show stop immediately when starting generation
+        generate_btn.click(
+            fn=lambda: gr.update(visible=True),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            queue=False
+        )
+
+        gen_event = generate_btn.click(
+            fn=handle_tts_generation_fn,
+            inputs=[
+                tts_text, tts_model_name, tts_provider, tts_voice, tts_speed
+            ],
+            outputs=[output_audio, status_text]
+        )
+
+        # Stop current TTS generation
+        stop_generate_btn.click(
+            fn=lambda: gr.update(visible=False),
+            inputs=None,
+            outputs=[stop_generate_btn],
+            cancels=[gen_event],
+            queue=False
+        )
+
+        # Hide stop after generation completes
+        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+
+
 def create_image_to_image_presets(img2img_model_name, img2img_provider):
     """Create quick model presets for image-to-image generation."""
     with gr.Group():
@@ -428,6 +534,29 @@ def create_image_to_image_examples(img2img_prompt):
         img2img_examples = gr.Examples(
             examples=[[prompt] for prompt in IMAGE_TO_IMAGE_EXAMPLE_PROMPTS],
             inputs=img2img_prompt
+        )
+
+
+def create_tts_presets(tts_model_name, tts_provider):
+    """Create quick model presets for text-to-speech generation."""
+    with gr.Group():
+        gr.Markdown("**🎯 Popular Presets**")
+        
+        for name, model, provider in TTS_MODEL_PRESETS:
+            btn = gr.Button(name, size="sm")
+            btn.click(
+                lambda m=model, p=provider: (m, p),
+                outputs=[tts_model_name, tts_provider]
+            )
+
+
+def create_tts_examples(tts_text):
+    """Create example texts for text-to-speech generation."""
+    with gr.Group():
+        gr.Markdown("**🌟 Example Texts**")
+        tts_examples = gr.Examples(
+            examples=[[text] for text in TTS_EXAMPLE_TEXTS],
+            inputs=tts_text
         )
 
 
@@ -459,12 +588,13 @@ def create_main_header():
     gr.Markdown("""
     # 🚀 HF-Inferoxy AI Hub
     
-    A comprehensive AI platform combining chat and image generation capabilities with intelligent token management through HF-Inferoxy.
+    A comprehensive AI platform combining chat, image generation, and text-to-speech capabilities with intelligent token management through HF-Inferoxy.
     
     **Features:**
     - 💬 **Smart Chat**: Conversational AI with streaming responses
     - 🎨 **Image Generation**: Text-to-image creation with multiple providers  
     - 🖼️ **Image-to-Image**: Transform and modify existing images with AI
+    - 🎤 **Text-to-Speech**: Convert text to natural-sounding speech with Kokoro
     - 🔄 **Intelligent Token Management**: Automatic token rotation and error handling
     - 🌐 **Multi-Provider Support**: Works with HF Inference, Cerebras, Cohere, Groq, Together, Fal.ai, and more
     """)
@@ -493,6 +623,13 @@ def create_footer():
     - Use negative prompts to avoid unwanted modifications
     - Perfect for style transfers, object additions, and image transformations
     - Works great with models like Qwen Image Edit and FLUX.1 Kontext
+    
+    **Text-to-Speech Tab:**
+    - Enter text you want to convert to speech
+    - Choose from various English voices (US and UK accents)
+    - Adjust speed from 0.5x to 2.0x
+    - Powered by Kokoro TTS model for natural-sounding speech
+    - Supports both fal-ai and replicate providers
     
     **Supported Providers:**
     - **fal-ai**: High-quality image generation (default for images)
