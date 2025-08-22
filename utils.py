@@ -300,33 +300,40 @@ def format_access_denied_message(message: str) -> str:
 def render_with_reasoning_toggle(text: str, show_reasoning: bool) -> str:
     """Render assistant text while optionally revealing content inside <think>...</think>.
 
-    When show_reasoning is True, wrap the reasoning content in a collapsible HTML details block
-    with a fenced code block for readability. When False, strip the reasoning content entirely.
+    Behavior:
+    - When show_reasoning is True:
+      * Replace the opening <think> tag with a collapsible HTML <details> block and an opening
+        fenced code block. Stream reasoning tokens inside this block as they arrive.
+      * Replace the closing </think> tag with the closing fence and </details> when it appears.
+    - When show_reasoning is False:
+      * Remove complete <think>...</think> blocks.
+      * For partial streams (no closing tag yet), trim everything from the first <think> onward.
 
-    This function is designed to be called repeatedly during streaming; it will simply do nothing
-    until both opening and closing tags appear in the text.
+    Safe to call on every streamed chunk; conversions are idempotent.
     """
-    if not isinstance(text, str) or "<think>" not in text:
+    if not isinstance(text, str):
         return text
 
-    pattern = re.compile(r"<think>([\s\S]*?)</think>", re.IGNORECASE)
+    # If we are NOT showing reasoning, remove it entirely. For partial streams, hide from <think> onwards.
+    if not show_reasoning:
+        if "<think>" not in text:
+            return text
+        if "</think>" not in text:
+            return text.split("<think>", 1)[0]
+        # Remove complete <think>...</think> blocks
+        pattern_strip = re.compile(r"<think>[\s\S]*?</think>", re.IGNORECASE)
+        return pattern_strip.sub("", text)
 
-    # If the closing tag hasn't arrived yet (streaming), hide the partial reasoning
-    if "</think>" not in text:
-        # Trim everything from the first <think> onwards
-        head = text.split("<think>", 1)[0]
-        return head
+    # Show reasoning: stream it as it arrives by converting tags into a collapsible details block
+    open_block = "<details><summary>Reasoning</summary>\n\n```text\n"
+    close_block = "\n```\n</details>\n"
 
-    def _replace(match: re.Match) -> str:
-        content = match.group(1).strip()
-        if not show_reasoning:
-            return ""
-        # Use HTML <details> which is generally supported by Markdown renderers
-        # and keep the reasoning in a code fence for safe rendering.
-        return (
-            "<details><summary>Reasoning</summary>\n\n" 
-            "```text\n" + content + "\n```\n"
-            "</details>\n"
-        )
+    # Convert opening tag when first seen; idempotent if it's already converted
+    if "<think>" in text:
+        text = re.sub(r"<think>", open_block, text, flags=re.IGNORECASE)
 
-    return pattern.sub(_replace, text)
+    # Convert closing tag when it appears
+    if "</think>" in text:
+        text = re.sub(r"</think>", close_block, text, flags=re.IGNORECASE)
+
+    return text
