@@ -94,6 +94,7 @@ TTS_MODEL_PRESETS = [
     ("Kokoro (Fal.ai)", "hexgrad/Kokoro-82M", "fal-ai"),
     ("Kokoro (Replicate)", "hexgrad/Kokoro-82M", "replicate"),
     ("Chatterbox (Fal.ai)", "ResembleAI/chatterbox", "fal-ai"),
+    ("Dia (Auto)", "nari-labs/Dia-1.6B", "auto"),
 ]
 
 # Model-specific configurations for TTS
@@ -109,6 +110,12 @@ TTS_MODEL_CONFIGS = {
         "supports_voice": False,
         "supports_speed": False,
         "extra_body_params": ["audio_url", "exaggeration", "temperature", "cfg"]
+    },
+    "nari-labs/Dia-1.6B": {
+        "type": "dia",
+        "supports_voice": False,
+        "supports_speed": False,
+        "extra_body_params": []
     }
 }
 
@@ -177,15 +184,14 @@ TTS_EXAMPLE_TEXTS = [
     "The future belongs to those who believe in the beauty of their dreams and have the courage to pursue them.",
     "Science is not only compatible with spirituality; it is a profound source of spirituality.",
     "The only way to do great work is to love what you do. If you haven't found it yet, keep looking.",
-    "Life is what happens when you're busy making other plans. Embrace every moment with gratitude."
+    "Life is what happens when you're busy making other plans. Embrace every moment with gratitude.",
+    "[S1] Dia is an open weights text to dialogue model. [S2] You get full control over scripts and voices. [S1] Wow. Amazing. (laughs) [S2] Try it now."
 ]
 
 # Example audio URLs for Chatterbox TTS
 TTS_EXAMPLE_AUDIO_URLS = [
     "https://github.com/nazdridoy/kokoro-tts/raw/main/previews/demo.mp3",
-    "https://huggingface.co/datasets/hf-internal-testing/fixtures/resolve/main/audio/sample_audio_1.mp3",
-    "https://huggingface.co/datasets/hf-internal-testing/fixtures/resolve/main/audio/sample_audio_2.mp3",
-    "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    "https://storage.googleapis.com/chatterbox-demo-samples/prompts/male_rickmorty.mp3"
 ]
 
 
