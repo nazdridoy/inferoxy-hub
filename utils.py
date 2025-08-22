@@ -325,15 +325,23 @@ def render_with_reasoning_toggle(text: str, show_reasoning: bool) -> str:
         return pattern_strip.sub("", text)
 
     # Show reasoning: stream it as it arrives by converting tags into a collapsible details block
-    open_block = "<details><summary>Reasoning</summary>\n\n```text\n"
+    open_block_open = "<details open><summary>Reasoning</summary>\n\n```text\n"
+    open_block_closed = "<details><summary>Reasoning</summary>\n\n```text\n"
     close_block = "\n```\n</details>\n"
 
-    # Convert opening tag when first seen; idempotent if it's already converted
-    if "<think>" in text:
-        text = re.sub(r"<think>", open_block, text, flags=re.IGNORECASE)
+    # If the closing tag is not present yet, keep the block expanded while streaming
+    if "</think>" not in text:
+        # Replace any raw <think> with an expanded details block
+        text = re.sub(r"<think>", open_block_open, text, flags=re.IGNORECASE)
+        # If for any reason a closed details opening exists, switch it to open (expanded)
+        text = text.replace(open_block_closed, open_block_open)
+        return text
 
-    # Convert closing tag when it appears
-    if "</think>" in text:
-        text = re.sub(r"</think>", close_block, text, flags=re.IGNORECASE)
+    # If the closing tag is present, render a collapsed block by default
+    # 1) Ensure opening is the closed variant
+    text = re.sub(r"<think>", open_block_closed, text, flags=re.IGNORECASE)
+    text = text.replace(open_block_open, open_block_closed)
+    # 2) Close the block
+    text = re.sub(r"</think>", close_block, text, flags=re.IGNORECASE)
 
     return text
