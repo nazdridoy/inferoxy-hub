@@ -430,7 +430,8 @@ def create_tts_tab(handle_tts_generation_fn):
                     label="Generated Audio",
                     type="numpy",
                     interactive=False,
-                    autoplay=True
+                    autoplay=False,
+                    show_download_button=True
                 )
                 status_text = gr.Textbox(
                     label="Generation Status",
@@ -459,7 +460,7 @@ def create_tts_tab(handle_tts_generation_fn):
                     gr.Markdown("**🎤 Voice Settings**")
                     tts_voice = gr.Dropdown(
                         choices=list(TTS_VOICES.items()),
-                        value="am_eric",
+                        value="af_bella",
                         label="Voice",
                         info="Choose from various English voices"
                     )
