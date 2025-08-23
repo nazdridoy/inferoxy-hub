@@ -58,12 +58,12 @@ Compatible with providers configured in HF‑Inferoxy, including `auto` (default
 - Slow/failures: try smaller models, fewer steps, or another provider.
 
 ### License
-AGPL‑3.0. See `LICENSE`.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
 
 ### Links
-- Live Space: `https://huggingface.co/spaces/nazdridoy/inferoxy-hub`
-- HF‑Inferoxy docs: `https://nazdridoy.github.io/hf-inferoxy/`
-- Gradio docs: `https://gradio.app/docs/`
+- Live Space: [huggingface.co/spaces/nazdridoy/inferoxy-hub](https://huggingface.co/spaces/nazdridoy/inferoxy-hub)
+- HF‑Inferoxy docs: [nazdridoy.github.io/hf-inferoxy](https://nazdridoy.github.io/hf-inferoxy/)
+- Gradio docs: [gradio.app/docs](https://gradio.app/docs/)
 
 — Built with HF‑Inferoxy for intelligent token management.
 

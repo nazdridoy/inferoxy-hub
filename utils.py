@@ -192,6 +192,20 @@ TTS_VOICES = {
     '🇬🇧 🚹 Daniel': 'bm_daniel',
 }
 
+# Example prompts for chat 
+CHAT_EXAMPLE_PROMPTS = [
+    "What's a polite way to introduce myself at a networking event?",
+    "Can you suggest a fun icebreaker question for a group chat?",
+    "Explain the concept of entropy in simple terms suitable for a high school student.",
+    "Summarize the main differences between classical and operant conditioning.",
+    "Is it possible for artificial intelligence to possess consciousness? Discuss briefly.",
+    "What does 'the map is not the territory' mean in philosophy?",
+    "Write a Python function to reverse a linked list.",
+    "How can I optimize a SQL query for faster performance?",
+    "Suggest 3 imaginative prompts for generating images of futuristic cities.",
+    "Give me 3 creative prompts for generating surreal animal portraits.",
+]
+
 # Example prompts for image generation
 IMAGE_EXAMPLE_PROMPTS = [
     "A majestic dragon flying over a medieval castle, epic fantasy art, detailed, 8k",

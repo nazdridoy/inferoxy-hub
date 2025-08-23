@@ -28,7 +28,6 @@ def create_app():
         # Sidebar with HF OAuth login/logout
         with gr.Sidebar():
             gr.LoginButton()
-        
         # Main header
         create_main_header()
         
@@ -48,8 +47,8 @@ def create_app():
 
             # Text-to-speech tab
             create_tts_tab(handle_text_to_speech_generation)
-        
-        # Footer with helpful information
+            
+        # Footer with helpful links
         create_footer()
     
     return demo

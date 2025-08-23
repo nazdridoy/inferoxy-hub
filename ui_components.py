@@ -10,7 +10,7 @@ from utils import (
     DEFAULT_TTS_MODEL,
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS,
     TTS_VOICES, TTS_MODEL_CONFIGS,
-    IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS,
+    CHAT_EXAMPLE_PROMPTS, IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS,
     DEFAULT_VIDEO_MODEL, VIDEO_EXAMPLE_PROMPTS,
     SUGGESTED_CHAT_MODELS, SUGGESTED_IMAGE_MODELS, SUGGESTED_IMAGE_TO_IMAGE_MODELS, SUGGESTED_VIDEO_MODELS
 )
@@ -78,8 +78,13 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                     label="Top-p (nucleus sampling)"
                 )
         
-        # Configuration tips below the chat
-        create_chat_tips()
+        # Example prompts for chat
+        with gr.Group():
+            gr.Markdown("**🌟 Example Prompts**")
+            gr.Examples(
+                examples=[[p] for p in CHAT_EXAMPLE_PROMPTS],
+                inputs=chat_input
+            )
         
         # Connect chat events (streaming auto-detected from generator function)
         # Show stop immediately when sending
@@ -133,35 +138,6 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
                         chat_provider, chat_max_tokens, chat_temperature, chat_top_p],
                 outputs=chatbot_display
             )
-
-
-def create_chat_tips():
-    """Create the tips section for the chat tab."""
-    with gr.Row():
-        with gr.Column():
-            gr.Markdown("""
-            ### 💡 Chat Tips
-            
-            **Model Format:**
-            - Model only: `openai/gpt-oss-20b`
-            - Select provider via the Provider dropdown (default: `auto`)
-            
-            **Popular Models:**
-            - `openai/gpt-oss-20b` - Fast general purpose
-            - `meta-llama/Llama-2-7b-chat-hf` - Chat optimized
-            - `microsoft/DialoGPT-medium` - Conversation
-            - `google/flan-t5-base` - Instruction following
-            """)
-        
-        with gr.Column():
-            gr.Markdown("""
-            ### 🚀 Popular Providers
-            
-            - Select from dropdown. Default is **auto**.
-            
-            **Example:**
-            - Model: `openai/gpt-oss-20b`, Provider: `groq`
-            """)
 
 
 def create_image_tab(handle_image_generation_fn):
@@ -742,36 +718,15 @@ def create_main_header():
 
 
 def create_footer():
-    """Create the footer with helpful information."""
-    gr.Markdown("""
-    ---
-    ### 📚 Quick Guide
-    
-    **Chat**
-    - Type a message, pick a model, set provider (defaults to `auto`).
-    - Tune system message, temperature, top‑p, and max new tokens.
-    
-    **Image**
-    - Write a prompt and select model/provider.
-    - Optional: width/height (÷8), steps, guidance, seed, negative prompt.
-    
-    **Image‑to‑Image**
-    - Upload an input image and describe the change you want.
-    - Use the same settings as Image for quality and control.
-    
-    **Video**
-    - Provide a short motion prompt; optionally set steps, guidance, and seed.
-    
-    **Text‑to‑Speech**
-    - Enter text, choose a TTS model, and adjust voice/style if available.
-    
-    **Providers**
-    - Default is `auto`. You can choose from providers available via your HF‑Inferoxy setup.
-    
-    **Docs**
-    - HF‑Inferoxy: https://nazdridoy.github.io/hf-inferoxy/
-    
-    Built with HF‑Inferoxy for secure token management and provider routing.
-    """)
+    """Render a simple footer with helpful links."""
+    gr.Markdown(
+        """
+        ---
+        ### 🔗 Links
+        - **Project repo**: https://github.com/nazdridoy/inferoxy-hub
+        - **HF‑Inferoxy docs**: https://nazdridoy.github.io/hf-inferoxy/
+        - **License**: https://github.com/nazdridoy/inferoxy-hub/blob/main/LICENSE
+        """
+    )
 
 
