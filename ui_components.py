@@ -11,7 +11,8 @@ from utils import (
     CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS,
     TTS_VOICES, TTS_MODEL_CONFIGS,
     IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS,
-    DEFAULT_VIDEO_MODEL, VIDEO_EXAMPLE_PROMPTS
+    DEFAULT_VIDEO_MODEL, VIDEO_EXAMPLE_PROMPTS,
+    SUGGESTED_CHAT_MODELS, SUGGESTED_IMAGE_MODELS, SUGGESTED_IMAGE_TO_IMAGE_MODELS, SUGGESTED_VIDEO_MODELS
 )
 
 
@@ -42,11 +43,13 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         # Configuration options below the chat
         with gr.Row():
             with gr.Column(scale=1):
-                chat_model_name = gr.Textbox(
+                chat_model_name = gr.Dropdown(
+                    choices=SUGGESTED_CHAT_MODELS,
                     value=DEFAULT_CHAT_MODEL,
-                    label="Model Name",
-                    placeholder="e.g., openai/gpt-oss-20b (provider via dropdown)",
-                    info="Do not include :provider in model name"
+                    label="Model",
+                    info="Select or type any model id",
+                    allow_custom_value=True,
+                    interactive=True
                 )
                 chat_provider = gr.Dropdown(
                     choices=IMAGE_PROVIDERS,
@@ -185,10 +188,13 @@ def create_image_tab(handle_image_generation_fn):
                 # Model and provider inputs
                 with gr.Group():
                     gr.Markdown("**🤖 Model & Provider**")
-                    img_model_name = gr.Textbox(
+                    img_model_name = gr.Dropdown(
+                        choices=SUGGESTED_IMAGE_MODELS,
                         value=DEFAULT_IMAGE_MODEL,
-                        label="Model Name",
-                        placeholder="e.g., Qwen/Qwen-Image or stabilityai/stable-diffusion-xl-base-1.0"
+                        label="Model",
+                        info="Select or type any model id",
+                        allow_custom_value=True,
+                        interactive=True
                     )
                     img_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,
@@ -304,10 +310,13 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
                 # Model and provider inputs
                 with gr.Group():
                     gr.Markdown("**🤖 Model & Provider**")
-                    img2img_model_name = gr.Textbox(
+                    img2img_model_name = gr.Dropdown(
+                        choices=SUGGESTED_IMAGE_TO_IMAGE_MODELS,
                         value=DEFAULT_IMAGE_TO_IMAGE_MODEL,
-                        label="Model Name",
-                        placeholder="e.g., Qwen/Qwen-Image-Edit or black-forest-labs/FLUX.1-Kontext-dev"
+                        label="Model",
+                        info="Select or type any model id",
+                        allow_custom_value=True,
+                        interactive=True
                     )
                     img2img_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,
@@ -583,10 +592,13 @@ def create_video_tab(handle_video_generation_fn):
                 # Model and provider inputs
                 with gr.Group():
                     gr.Markdown("**🤖 Model & Provider**")
-                    vid_model_name = gr.Textbox(
+                    vid_model_name = gr.Dropdown(
+                        choices=SUGGESTED_VIDEO_MODELS,
                         value=DEFAULT_VIDEO_MODEL,
-                        label="Model Name",
-                        placeholder="e.g., tencent/HunyuanVideo, Wan-AI/Wan2.2-T2V-A14B"
+                        label="Model",
+                        info="Select or type any model id",
+                        allow_custom_value=True,
+                        interactive=True
                     )
                     vid_provider = gr.Dropdown(
                         choices=IMAGE_PROVIDERS,

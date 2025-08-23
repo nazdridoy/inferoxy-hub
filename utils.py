@@ -74,6 +74,55 @@ POPULAR_IMAGE_MODELS = [
     "runwayml/stable-diffusion-v1-5"
 ]
 
+# Suggested model lists (users can still input any model id)
+SUGGESTED_CHAT_MODELS = [
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
+    "deepseek-ai/DeepSeek-V3.1",
+    "zai-org/GLM-4.5",
+    "Qwen/Qwen3-8B",
+    "meta-llama/Llama-3.1-8B-Instruct",
+    "deepseek-ai/DeepSeek-R1",
+    "moonshotai/Kimi-K2-Instruct",
+    "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+    "CohereLabs/command-a-reasoning-08-2025",
+]
+
+SUGGESTED_IMAGE_MODELS = [
+    "Qwen/Qwen-Image",
+    "black-forest-labs/FLUX.1-dev",
+    "black-forest-labs/FLUX.1-Krea-dev",
+    "stabilityai/stable-diffusion-xl-base-1.0",
+    "black-forest-labs/FLUX.1-schnell",
+    "ByteDance/Hyper-SD",
+    "UmeAiRT/FLUX.1-dev-LoRA-Modern_Pixel_art",
+    "xey/sldr_flux_nsfw_v2-studio",
+    "HiDream-ai/HiDream-I1-Full",
+    "Kwai-Kolors/Kolors",
+]
+
+SUGGESTED_IMAGE_TO_IMAGE_MODELS = [
+    "Qwen/Qwen-Image-Edit",
+    "black-forest-labs/FLUX.1-Kontext-dev",
+    "fofr/kontext-make-person-real",
+    "jerrrycans/watermark20000",
+    "fal/Pencil-Drawing-Kontext-Dev-LoRA",
+]
+
+SUGGESTED_VIDEO_MODELS = [
+    "Wan-AI/Wan2.2-T2V-A14B",
+    "Wan-AI/Wan2.2-TI2V-5B",
+    "tencent/HunyuanVideo",
+    "Wan-AI/Wan2.2-T2V-A14B-Diffusers",
+    "zai-org/CogVideoX-5b",
+    "Wan-AI/Wan2.1-T2V-14B",
+    "genmo/mochi-1-preview",
+    "Wan-AI/Wan2.1-T2V-1.3B",
+    "Lightricks/LTX-Video-0.9.7-dev",
+    "Lightricks/LTX-Video-0.9.5",
+    "Lightricks/LTX-Video-0.9.7-distilled",
+]
+
 
 
 # Model-specific configurations for TTS
