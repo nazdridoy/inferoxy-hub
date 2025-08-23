@@ -74,29 +74,7 @@ POPULAR_IMAGE_MODELS = [
     "runwayml/stable-diffusion-v1-5"
 ]
 
-# Model presets for image generation
-IMAGE_MODEL_PRESETS = [
-    ("Qwen (Fal.ai)", "Qwen/Qwen-Image", "fal-ai"),
-    ("Qwen (Replicate)", "Qwen/Qwen-Image", "replicate"),
-    ("FLUX.1 (Nebius)", "black-forest-labs/FLUX.1-dev", "nebius"), 
-    ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
-]
 
-# Model presets for image-to-image generation
-IMAGE_TO_IMAGE_MODEL_PRESETS = [
-    ("Qwen Image Edit (Fal.ai)", "Qwen/Qwen-Image-Edit", "fal-ai"),
-    ("Qwen Image Edit (Replicate)", "Qwen/Qwen-Image-Edit", "replicate"),
-    ("FLUX.1 Kontext (Nebius)", "black-forest-labs/FLUX.1-Kontext-dev", "nebius"),
-    ("SDXL (HF)", "stabilityai/stable-diffusion-xl-base-1.0", "hf-inference"),
-]
-
-# Model presets for text-to-speech generation
-TTS_MODEL_PRESETS = [
-    ("Kokoro (Fal.ai)", "hexgrad/Kokoro-82M", "fal-ai"),
-    ("Kokoro (Replicate)", "hexgrad/Kokoro-82M", "replicate"),
-    ("Chatterbox (Fal.ai)", "ResembleAI/chatterbox", "fal-ai"),
-    ("Dia (Auto)", "nari-labs/Dia-1.6B", "auto"),
-]
 
 # Model-specific configurations for TTS
 TTS_MODEL_CONFIGS = {
@@ -124,13 +102,6 @@ TTS_MODEL_CONFIGS = {
 # Text-to-Video configuration
 # -----------------------------
 
-# Model presets for text-to-video generation
-VIDEO_MODEL_PRESETS = [
-    ("Wan 2.2 (Replicate)", "Wan-AI/Wan2.2-T2V-A14B", "fal-ai"),
-    ("LTX-Video 0.9.7 (Fal.ai)", "Lightricks/LTX-Video-0.9.7-dev", "fal-ai"),
-    ("HunyuanVideo (Auto)", "tencent/HunyuanVideo", "auto"),
-    ("CogVideoX-5b (Fal.ai)", "zai-org/CogVideoX-5b", "fal-ai"),
-]
 
 # Example prompts for text-to-video generation
 VIDEO_EXAMPLE_PROMPTS = [

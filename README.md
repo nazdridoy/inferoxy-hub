@@ -17,7 +17,7 @@ A focused, multi‑modal AI workspace. Chat, create images, transform images, ge
 - Chat, Image, Image‑to‑Image, Video, and TTS in one app
 - Works with any HF model exposed by your proxy
 - Multi‑provider routing; default provider is `auto`
-- Streaming chat and curated presets/examples
+- Streaming chat and curated examples
 
 ### Quick Start (Hugging Face Space)
 Add Space secrets:

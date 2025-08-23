@@ -8,10 +8,10 @@ from utils import (
     DEFAULT_CHAT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_PROVIDER,
     DEFAULT_IMAGE_TO_IMAGE_MODEL,
     DEFAULT_TTS_MODEL,
-    CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS, IMAGE_MODEL_PRESETS,
-    IMAGE_TO_IMAGE_MODEL_PRESETS, TTS_MODEL_PRESETS, TTS_VOICES, TTS_MODEL_CONFIGS,
+    CHAT_CONFIG, IMAGE_CONFIG, IMAGE_PROVIDERS,
+    TTS_VOICES, TTS_MODEL_CONFIGS,
     IMAGE_EXAMPLE_PROMPTS, IMAGE_TO_IMAGE_EXAMPLE_PROMPTS, TTS_EXAMPLE_TEXTS, TTS_EXAMPLE_AUDIO_URLS,
-    DEFAULT_VIDEO_MODEL, VIDEO_MODEL_PRESETS, VIDEO_EXAMPLE_PROMPTS
+    DEFAULT_VIDEO_MODEL, VIDEO_EXAMPLE_PROMPTS
 )
 
 
@@ -250,8 +250,7 @@ def create_image_tab(handle_image_generation_fn):
                     )
                     stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
                 
-                # Quick model presets
-                create_image_presets(img_model_name, img_provider)
+                
         
         # Examples for image generation
         create_image_examples(img_prompt)
@@ -375,8 +374,7 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
                     )
                     stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
                 
-                # Quick model presets
-                create_image_to_image_presets(img2img_model_name, img2img_provider)
+                
         
         # Examples for image-to-image generation
         create_image_to_image_examples(img2img_prompt)
@@ -504,8 +502,7 @@ def create_tts_tab(handle_tts_generation_fn):
                     )
                     stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
                 
-                # Quick model presets
-                create_tts_presets(tts_model_name, tts_provider)
+                
         
         # Examples for TTS generation
         create_tts_examples(tts_text)
@@ -634,15 +631,7 @@ def create_video_tab(handle_video_generation_fn):
                     )
                     stop_generate_btn = gr.Button("⏹ Stop", variant="secondary", visible=False)
 
-                # Quick model presets
-                with gr.Group():
-                    gr.Markdown("**🎯 Popular Presets**")
-                    for name, model, provider in VIDEO_MODEL_PRESETS:
-                        btn = gr.Button(name, size="sm")
-                        btn.click(
-                            lambda m=model, p=provider: (m, p),
-                            outputs=[vid_model_name, vid_provider]
-                        )
+                
 
         # Examples for video generation
         with gr.Group():
@@ -682,19 +671,6 @@ def create_video_tab(handle_video_generation_fn):
         gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
 
 
-def create_image_to_image_presets(img2img_model_name, img2img_provider):
-    """Create quick model presets for image-to-image generation."""
-    with gr.Group():
-        gr.Markdown("**🎯 Popular Presets**")
-        
-        for name, model, provider in IMAGE_TO_IMAGE_MODEL_PRESETS:
-            btn = gr.Button(name, size="sm")
-            btn.click(
-                lambda m=model, p=provider: (m, p),
-                outputs=[img2img_model_name, img2img_provider]
-            )
-
-
 def create_image_to_image_examples(img2img_prompt):
     """Create example prompts for image-to-image generation."""
     with gr.Group():
@@ -703,19 +679,6 @@ def create_image_to_image_examples(img2img_prompt):
             examples=[[prompt] for prompt in IMAGE_TO_IMAGE_EXAMPLE_PROMPTS],
             inputs=img2img_prompt
         )
-
-
-def create_tts_presets(tts_model_name, tts_provider):
-    """Create quick model presets for text-to-speech generation."""
-    with gr.Group():
-        gr.Markdown("**🎯 Popular Presets**")
-        
-        for name, model, provider in TTS_MODEL_PRESETS:
-            btn = gr.Button(name, size="sm")
-            btn.click(
-                lambda m=model, p=provider: (m, p),
-                outputs=[tts_model_name, tts_provider]
-            )
 
 
 def create_tts_examples(tts_text):
@@ -736,19 +699,6 @@ def create_chatterbox_examples(tts_audio_url):
             examples=[[url] for url in TTS_EXAMPLE_AUDIO_URLS],
             inputs=tts_audio_url
         )
-
-
-def create_image_presets(img_model_name, img_provider):
-    """Create quick model presets for image generation."""
-    with gr.Group():
-        gr.Markdown("**🎯 Popular Presets**")
-        
-        for name, model, provider in IMAGE_MODEL_PRESETS:
-            btn = gr.Button(name, size="sm")
-            btn.click(
-                lambda m=model, p=provider: (m, p),
-                outputs=[img_model_name, img_provider]
-            )
 
 
 def create_image_examples(img_prompt):
