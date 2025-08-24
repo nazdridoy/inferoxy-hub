@@ -32,6 +32,7 @@ def generate_video(
     num_inference_steps: int | None = None,
     guidance_scale: float | None = None,
     seed: int | None = None,
+    client_name: str | None = None,
 ):
     """
     Generate a video using the specified model and provider through HF-Inferoxy.
@@ -93,7 +94,7 @@ def generate_video(
 
         # Report successful token usage
         if token_id:
-            report_token_status(token_id, "success", api_key=proxy_api_key)
+            report_token_status(token_id, "success", api_key=proxy_api_key, client_name=client_name)
 
         return video_output, format_success_message("Video generated", f"using {model_name} on {provider}")
 
@@ -101,21 +102,21 @@ def generate_video(
         error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
         print(f"🔌 Video connection error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Connection Error", "Unable to connect to the proxy server. Please check if it's running.")
 
     except TimeoutError as e:
         error_msg = f"Video generation timed out: {str(e)}"
         print(f"⏰ Video timeout: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Timeout Error", f"Video generation took too long (>{VIDEO_GENERATION_TIMEOUT//60} minutes). Try a shorter prompt.")
 
     except HfHubHTTPError as e:
         error_msg = str(e)
         print(f"🤗 Video HF error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         if "401" in error_msg:
             return None, format_error_message("Authentication Error", "Invalid or expired API token. The proxy will provide a new token on retry.")
         elif "402" in error_msg:
@@ -141,7 +142,7 @@ def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guid
         return None, format_error_message("Validation Error", "Please enter a prompt for video generation")
 
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    is_allowed, access_msg, username, _matched = check_org_access(access_token)
     if not is_allowed:
         return None, format_access_denied_message(access_msg)
 
@@ -152,6 +153,7 @@ def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guid
         num_inference_steps=steps_val if steps_val is not None else None,
         guidance_scale=guidance_val if guidance_val is not None else None,
         seed=seed_val if seed_val is not None else None,
+        client_name=username,
     )
 
 

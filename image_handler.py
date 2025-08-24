@@ -42,6 +42,7 @@ def generate_image(
     num_inference_steps: int = IMAGE_CONFIG["num_inference_steps"],
     guidance_scale: float = IMAGE_CONFIG["guidance_scale"],
     seed: int = IMAGE_CONFIG["seed"],
+    client_name: str | None = None,
 ):
     """
     Generate an image using the specified model and provider through HF-Inferoxy.
@@ -108,7 +109,7 @@ def generate_image(
         
         # Report successful token usage
         if token_id:
-            report_token_status(token_id, "success", api_key=proxy_api_key)
+            report_token_status(token_id, "success", api_key=proxy_api_key, client_name=client_name)
         
         return image, format_success_message("Image generated", f"using {model_name} on {provider}")
         
@@ -117,7 +118,7 @@ def generate_image(
         error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
         print(f"🔌 Image connection error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Connection Error", "Unable to connect to the proxy server. Please check if it's running.")
         
     except TimeoutError as e:
@@ -125,7 +126,7 @@ def generate_image(
         error_msg = f"Image generation timed out: {str(e)}"
         print(f"⏰ Image timeout: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Timeout Error", f"Image generation took too long (>{IMAGE_GENERATION_TIMEOUT//60} minutes). Try reducing image size or steps.")
         
     except HfHubHTTPError as e:
@@ -133,7 +134,7 @@ def generate_image(
         error_msg = str(e)
         print(f"🤗 Image HF error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         
         # Provide more user-friendly error messages
         if "401" in error_msg:
@@ -165,6 +166,7 @@ def generate_image_to_image(
     num_inference_steps: int = IMAGE_CONFIG["num_inference_steps"],
     guidance_scale: float = IMAGE_CONFIG["guidance_scale"],
     seed: int = IMAGE_CONFIG["seed"],
+    client_name: str | None = None,
 ):
     """
     Generate an image using image-to-image generation with the specified model and provider through HF-Inferoxy.
@@ -231,7 +233,7 @@ def generate_image_to_image(
         
         # Report successful token usage
         if token_id:
-            report_token_status(token_id, "success", api_key=proxy_api_key)
+            report_token_status(token_id, "success", api_key=proxy_api_key, client_name=client_name)
         
         return image, format_success_message("Image-to-image generated", f"using {model_name} on {provider}")
         
@@ -240,7 +242,7 @@ def generate_image_to_image(
         error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
         print(f"🔌 Image-to-Image connection error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Connection Error", "Unable to connect to the proxy server. Please check if it's running.")
         
     except TimeoutError as e:
@@ -248,7 +250,7 @@ def generate_image_to_image(
         error_msg = f"Image-to-image generation timed out: {str(e)}"
         print(f"⏰ Image-to-Image timeout: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Timeout Error", f"Image-to-image generation took too long (>{IMAGE_GENERATION_TIMEOUT//60} minutes). Try reducing steps.")
         
     except HfHubHTTPError as e:
@@ -256,7 +258,7 @@ def generate_image_to_image(
         error_msg = str(e)
         print(f"🤗 Image-to-Image HF error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         
         # Provide more user-friendly error messages
         if "401" in error_msg:
@@ -289,7 +291,7 @@ def handle_image_to_image_generation(input_image_val, prompt_val, model_val, pro
     
     # Enforce org-based access control via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    is_allowed, access_msg, username, _matched = check_org_access(access_token)
     if not is_allowed:
         return None, format_access_denied_message(access_msg)
     
@@ -302,7 +304,8 @@ def handle_image_to_image_generation(input_image_val, prompt_val, model_val, pro
         negative_prompt=negative_prompt_val,
         num_inference_steps=steps_val,
         guidance_scale=guidance_val,
-        seed=seed_val
+        seed=seed_val,
+        client_name=username
     )
 
 
@@ -317,7 +320,7 @@ def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt
     
     # Enforce org-based access control via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    is_allowed, access_msg, username, _matched = check_org_access(access_token)
     if not is_allowed:
         return None, format_access_denied_message(access_msg)
     
@@ -331,5 +334,6 @@ def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt
         height=height_val,
         num_inference_steps=steps_val,
         guidance_scale=guidance_val,
-        seed=seed_val
+        seed=seed_val,
+        client_name=username
     )

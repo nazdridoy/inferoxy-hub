@@ -99,7 +99,8 @@ def report_token_status(
     status: str = "success", 
     error: Optional[str] = None,
     proxy_url: str = None,
-    api_key: str = None
+    api_key: str = None,
+    client_name: Optional[str] = None
 ) -> bool:
     """
     Report token usage status back to the proxy server with timeout handling.
@@ -141,6 +142,9 @@ def report_token_status(
         if error_type:
             payload["error_type"] = error_type
     
+    if client_name:
+        payload["client_name"] = client_name
+
     headers = {"Content-Type": "application/json"}
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"

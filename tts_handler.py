@@ -36,6 +36,7 @@ def generate_text_to_speech(
     exaggeration: float = 0.25,
     temperature: float = 0.7,
     cfg: float = 0.5,
+    client_name: str | None = None,
 ):
     """
     Generate speech from text using the specified model and provider through HF-Inferoxy.
@@ -110,7 +111,7 @@ def generate_text_to_speech(
         
         # Report successful token usage
         if token_id:
-            report_token_status(token_id, "success", api_key=proxy_api_key)
+            report_token_status(token_id, "success", api_key=proxy_api_key, client_name=client_name)
         
         return audio, format_success_message("Speech generated", f"using {model_name} on {provider} with voice {voice}")
         
@@ -119,7 +120,7 @@ def generate_text_to_speech(
         error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
         print(f"🔌 TTS connection error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Connection Error", "Unable to connect to the proxy server. Please check if it's running.")
         
     except TimeoutError as e:
@@ -127,7 +128,7 @@ def generate_text_to_speech(
         error_msg = f"TTS generation timed out: {str(e)}"
         print(f"⏰ TTS timeout: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         return None, format_error_message("Timeout Error", f"TTS generation took too long (>{TTS_GENERATION_TIMEOUT//60} minutes). Try shorter text.")
         
     except HfHubHTTPError as e:
@@ -135,7 +136,7 @@ def generate_text_to_speech(
         error_msg = str(e)
         print(f"🤗 TTS HF error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         
         # Provide more user-friendly error messages
         if "401" in error_msg:
@@ -170,7 +171,7 @@ def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_va
     
     # Enforce org-based access control via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    is_allowed, access_msg, username, _matched = check_org_access(access_token)
     if not is_allowed:
         return None, format_access_denied_message(access_msg)
     
@@ -184,5 +185,6 @@ def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_va
         audio_url=audio_url_val,
         exaggeration=exaggeration_val,
         temperature=temperature_val,
-        cfg=cfg_val
+        cfg=cfg_val,
+        client_name=username
     )

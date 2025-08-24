@@ -33,6 +33,7 @@ def chat_respond(
     max_tokens,
     temperature,
     top_p,
+    client_name: str | None = None,
 ):
     """
     Chat completion function using HF-Inferoxy token management.
@@ -125,14 +126,14 @@ def chat_respond(
         
         # Report successful token usage
         if token_id:
-            report_token_status(token_id, "success", api_key=proxy_api_key)
+            report_token_status(token_id, "success", api_key=proxy_api_key, client_name=client_name)
             
     except ConnectionError as e:
         # Handle proxy connection errors
         error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
         print(f"🔌 Chat connection error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         yield format_error_message("Connection Error", "Unable to connect to the proxy server. Please check if it's running.")
         
     except TimeoutError as e:
@@ -140,7 +141,7 @@ def chat_respond(
         error_msg = f"Request timed out: {str(e)}"
         print(f"⏰ Chat timeout: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         yield format_error_message("Timeout Error", "The request took too long. The server may be overloaded. Please try again.")
         
     except HfHubHTTPError as e:
@@ -148,7 +149,7 @@ def chat_respond(
         error_msg = str(e)
         print(f"🤗 Chat HF error: {error_msg}")
         if token_id:
-            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key)
+            report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
         
         # Provide more user-friendly error messages
         if "401" in error_msg:
@@ -179,7 +180,7 @@ def handle_chat_submit(message, history, system_msg, model_name, provider, max_t
 
     # Enforce org-based access control via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    is_allowed, access_msg, username, _matched = check_org_access(access_token)
     if not is_allowed:
         # Show access denied as assistant message
         assistant_response = format_access_denied_message(access_msg)
@@ -199,7 +200,8 @@ def handle_chat_submit(message, history, system_msg, model_name, provider, max_t
         provider,
         max_tokens, 
         temperature, 
-        top_p
+        top_p,
+        client_name=username
     )
     
     # Stream the assistant response token by token
@@ -218,7 +220,7 @@ def handle_chat_retry(history, system_msg, model_name, provider, max_tokens, tem
     """
     # Enforce org-based access control via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, _username, _matched = check_org_access(access_token)
+    is_allowed, access_msg, username, _matched = check_org_access(access_token)
     if not is_allowed:
         # Show access denied as assistant message
         assistant_response = format_access_denied_message(access_msg)
@@ -273,7 +275,8 @@ def handle_chat_retry(history, system_msg, model_name, provider, max_tokens, tem
         provider,
         max_tokens,
         temperature,
-        top_p
+        top_p,
+        client_name=username
     )
 
     assistant_response = ""
