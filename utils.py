@@ -94,7 +94,6 @@ SUGGESTED_IMAGE_MODELS = [
     "black-forest-labs/FLUX.1-Krea-dev",
     "stabilityai/stable-diffusion-xl-base-1.0",
     "black-forest-labs/FLUX.1-schnell",
-    "ByteDance/Hyper-SD",
     "UmeAiRT/FLUX.1-dev-LoRA-Modern_Pixel_art",
     "xey/sldr_flux_nsfw_v2-studio",
     "HiDream-ai/HiDream-I1-Full",
@@ -103,6 +102,7 @@ SUGGESTED_IMAGE_MODELS = [
 
 SUGGESTED_IMAGE_TO_IMAGE_MODELS = [
     "Qwen/Qwen-Image-Edit",
+    "Kontext-Style/Ghibli_lora",
     "black-forest-labs/FLUX.1-Kontext-dev",
     "fofr/kontext-make-person-real",
     "jerrrycans/watermark20000",
