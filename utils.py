@@ -221,6 +221,7 @@ IMAGE_EXAMPLE_PROMPTS = [
 # Example prompts for image-to-image generation
 IMAGE_TO_IMAGE_EXAMPLE_PROMPTS = [
     "Turn the cat into a tiger with stripes and fierce expression",
+    "Turn this image into the Ghibli style.",
     "Make the background a magical forest with glowing mushrooms",
     "Change the style to vintage comic book with bold colors",
     "Add a superhero cape and mask to the person",
