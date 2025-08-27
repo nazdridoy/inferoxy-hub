@@ -1,5 +1,5 @@
 """
-HF-Inferoxy AI Hub - Main application entry point.
+AI-Inferoxy AI Hub - Main application entry point.
 A comprehensive AI platform with chat and image generation capabilities.
 """
 
@@ -24,7 +24,7 @@ def create_app():
     """Create and configure the main Gradio application."""
     
     # Create the main Gradio interface with tabs
-    with gr.Blocks(title="HF-Inferoxy AI Hub", theme=get_gradio_theme()) as demo:
+    with gr.Blocks(title="AI-Inferoxy AI Hub", theme=get_gradio_theme()) as demo:
         # Sidebar with HF OAuth login/logout
         with gr.Sidebar():
             gr.LoginButton()

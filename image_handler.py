@@ -1,5 +1,5 @@
 """
-Image generation functionality handler for HF-Inferoxy AI Hub.
+Image generation functionality handler for AI-Inferoxy AI Hub.
 Handles text-to-image generation with multiple providers.
 """
 
@@ -43,7 +43,7 @@ def generate_image(
     client_name: str | None = None,
 ):
     """
-    Generate an image using the specified model and provider through HF-Inferoxy.
+    Generate an image using the specified model and provider through AI-Inferoxy.
     """
     # Validate proxy API key
     is_valid, error_msg = validate_proxy_key()
@@ -54,7 +54,7 @@ def generate_image(
     
     token_id = None
     try:
-        # Get token from HF-Inferoxy proxy server with timeout handling
+        # Get token from AI-Inferoxy proxy server with timeout handling
         print(f"🔑 Image: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ Image: Got token: {token_id}")
@@ -113,7 +113,7 @@ def generate_image(
         
     except ConnectionError as e:
         # Handle proxy connection errors
-        error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
+        error_msg = f"Cannot connect to AI-Inferoxy server: {str(e)}"
         print(f"🔌 Image connection error: {error_msg}")
         if token_id:
             report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)
@@ -167,7 +167,7 @@ def generate_image_to_image(
     client_name: str | None = None,
 ):
     """
-    Generate an image using image-to-image generation with the specified model and provider through HF-Inferoxy.
+    Generate an image using image-to-image generation with the specified model and provider through AI-Inferoxy.
     """
     # Validate proxy API key
     is_valid, error_msg = validate_proxy_key()
@@ -178,7 +178,7 @@ def generate_image_to_image(
     
     token_id = None
     try:
-        # Get token from HF-Inferoxy proxy server with timeout handling
+        # Get token from AI-Inferoxy proxy server with timeout handling
         print(f"🔑 Image-to-Image: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ Image-to-Image: Got token: {token_id}")
@@ -237,7 +237,7 @@ def generate_image_to_image(
         
     except ConnectionError as e:
         # Handle proxy connection errors
-        error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
+        error_msg = f"Cannot connect to AI-Inferoxy server: {str(e)}"
         print(f"🔌 Image-to-Image connection error: {error_msg}")
         if token_id:
             report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)

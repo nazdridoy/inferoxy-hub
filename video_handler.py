@@ -1,5 +1,5 @@
 """
-Text-to-video functionality handler for HF-Inferoxy AI Hub.
+Text-to-video functionality handler for AI-Inferoxy AI Hub.
 Handles text-to-video generation with multiple providers.
 """
 
@@ -33,7 +33,7 @@ def generate_video(
     client_name: str | None = None,
 ):
     """
-    Generate a video using the specified model and provider through HF-Inferoxy.
+    Generate a video using the specified model and provider through AI-Inferoxy.
     Returns (video_bytes_or_url, status_message)
     """
     # Validate proxy API key
@@ -45,7 +45,7 @@ def generate_video(
 
     token_id = None
     try:
-        # Get token from HF-Inferoxy proxy server with timeout handling
+        # Get token from AI-Inferoxy proxy server with timeout handling
         print(f"🔑 Video: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ Video: Got token: {token_id}")
@@ -97,7 +97,7 @@ def generate_video(
         return video_output, format_success_message("Video generated", f"using {model_name} on {provider}")
 
     except ConnectionError as e:
-        error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
+        error_msg = f"Cannot connect to AI-Inferoxy server: {str(e)}"
         print(f"🔌 Video connection error: {error_msg}")
         if token_id:
             report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)

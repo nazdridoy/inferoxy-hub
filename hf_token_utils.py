@@ -17,7 +17,7 @@ def get_proxy_token(proxy_url: str = None, api_key: str = None) -> Tuple[str, st
     Get a valid token from the proxy server with timeout and retry logic.
     
     Args:
-        proxy_url: URL of the HF-Inferoxy server (optional, will use PROXY_URL env var if not provided)
+        proxy_url: URL of the AI-Inferoxy server (optional, will use PROXY_URL env var if not provided)
         api_key: Your API key for authenticating with the proxy server
         
     Returns:
@@ -46,7 +46,7 @@ def get_proxy_token(proxy_url: str = None, api_key: str = None) -> Tuple[str, st
             print(f"🔄 Token provision attempt {attempt + 1}/{RETRY_ATTEMPTS}")
             
             response = requests.get(
-                f"{proxy_url}/keys/provision", 
+                f"{proxy_url}/keys/provision/hf", 
                 headers=headers,
                 timeout=REQUEST_TIMEOUT
             )
@@ -73,14 +73,14 @@ def get_proxy_token(proxy_url: str = None, api_key: str = None) -> Tuple[str, st
             print(f"🔌 {error_msg}")
             
             if attempt == RETRY_ATTEMPTS - 1:  # Last attempt
-                raise ConnectionError(f"Cannot connect to HF-Inferoxy at {proxy_url}. Please check if the server is running.")
+                raise ConnectionError(f"Cannot connect to AI-Inferoxy at {proxy_url}. Please check if the server is running.")
             
         except Timeout as e:
             error_msg = f"Request timeout after {REQUEST_TIMEOUT}s: {str(e)}"
             print(f"⏰ {error_msg}")
             
             if attempt == RETRY_ATTEMPTS - 1:  # Last attempt
-                raise TimeoutError(f"Timeout connecting to HF-Inferoxy. Server may be overloaded.")
+                raise TimeoutError(f"Timeout connecting to AI-Inferoxy. Server may be overloaded.")
                 
         except RequestException as e:
             error_msg = f"Request error: {str(e)}"
@@ -109,7 +109,7 @@ def report_token_status(
         token_id: ID of the token to report (from get_proxy_token)
         status: Status to report ('success' or 'error')
         error: Error message if status is 'error'
-        proxy_url: URL of the HF-Inferoxy server (optional, will use PROXY_URL env var if not provided)
+        proxy_url: URL of the AI-Inferoxy server (optional, will use PROXY_URL env var if not provided)
         api_key: Your API key for authenticating with the proxy server
         
     Returns:
@@ -154,7 +154,7 @@ def report_token_status(
     for attempt in range(RETRY_ATTEMPTS):
         try:
             response = requests.post(
-                f"{proxy_url}/keys/report", 
+                f"{proxy_url}/keys/report/hf", 
                 json=payload, 
                 headers=headers,
                 timeout=REQUEST_TIMEOUT

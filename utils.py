@@ -1,5 +1,5 @@
 """
-Utility functions and constants for HF-Inferoxy AI Hub.
+Utility functions and constants for AI-Inferoxy AI Hub.
 Contains configuration constants and helper functions.
 """
 

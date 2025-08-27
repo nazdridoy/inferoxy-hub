@@ -1,5 +1,5 @@
 """
-Chat functionality handler for HF-Inferoxy AI Hub.
+Chat functionality handler for AI-Inferoxy AI Hub.
 Handles chat completion requests with streaming responses.
 """
 
@@ -34,7 +34,7 @@ def chat_respond(
     client_name: str | None = None,
 ):
     """
-    Chat completion function using HF-Inferoxy token management.
+    Chat completion function using AI-Inferoxy token management.
     """
     # Validate proxy API key
     is_valid, error_msg = validate_proxy_key()
@@ -46,7 +46,7 @@ def chat_respond(
     
     token_id = None
     try:
-        # Get token from HF-Inferoxy proxy server with timeout handling
+        # Get token from AI-Inferoxy proxy server with timeout handling
         print(f"🔑 Chat: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ Chat: Got token: {token_id}")
@@ -128,7 +128,7 @@ def chat_respond(
             
     except ConnectionError as e:
         # Handle proxy connection errors
-        error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
+        error_msg = f"Cannot connect to AI-Inferoxy server: {str(e)}"
         print(f"🔌 Chat connection error: {error_msg}")
         if token_id:
             report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)

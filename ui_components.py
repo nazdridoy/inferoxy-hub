@@ -1,5 +1,5 @@
 """
-UI components for HF-Inferoxy AI Hub.
+UI components for AI-Inferoxy AI Hub.
 Contains functions to create different sections of the Gradio interface.
 """
 
@@ -702,9 +702,9 @@ def create_image_examples(img_prompt):
 def create_main_header():
     """Create the main header for the application."""
     gr.Markdown("""
-    # 🚀 HF-Inferoxy AI Hub
+    # 🚀 AI-Inferoxy AI Hub
     
-    A comprehensive AI platform combining chat, image generation, image-to-image, text-to-video, and text-to-speech capabilities with intelligent token management through HF-Inferoxy.
+    A comprehensive AI platform combining chat, image generation, image-to-image, text-to-video, and text-to-speech capabilities with intelligent token management through AI-Inferoxy.
     
     **Features:**
     - 💬 **Smart Chat**: Conversational AI with streaming responses
@@ -724,7 +724,7 @@ def create_footer():
         ---
         ### 🔗 Links
         - **Project repo**: https://github.com/nazdridoy/inferoxy-hub
-        - **HF‑Inferoxy docs**: https://nazdridoy.github.io/hf-inferoxy/
+        - **AI‑Inferoxy docs**: https://nazdridoy.github.io/ai-inferoxy/
         - **License**: https://github.com/nazdridoy/inferoxy-hub/blob/main/LICENSE
         """
     )

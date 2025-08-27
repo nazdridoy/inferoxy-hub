@@ -1,5 +1,5 @@
 """
-Text-to-speech functionality handler for HF-Inferoxy AI Hub.
+Text-to-speech functionality handler for AI-Inferoxy AI Hub.
 Handles text-to-speech generation with multiple providers.
 """
 
@@ -37,7 +37,7 @@ def generate_text_to_speech(
     client_name: str | None = None,
 ):
     """
-    Generate speech from text using the specified model and provider through HF-Inferoxy.
+    Generate speech from text using the specified model and provider through AI-Inferoxy.
     """
     # Validate proxy API key
     is_valid, error_msg = validate_proxy_key()
@@ -48,7 +48,7 @@ def generate_text_to_speech(
     
     token_id = None
     try:
-        # Get token from HF-Inferoxy proxy server with timeout handling
+        # Get token from AI-Inferoxy proxy server with timeout handling
         print(f"🔑 TTS: Requesting token from proxy...")
         token, token_id = get_proxy_token(api_key=proxy_api_key)
         print(f"✅ TTS: Got token: {token_id}")
@@ -115,7 +115,7 @@ def generate_text_to_speech(
         
     except ConnectionError as e:
         # Handle proxy connection errors
-        error_msg = f"Cannot connect to HF-Inferoxy server: {str(e)}"
+        error_msg = f"Cannot connect to AI-Inferoxy server: {str(e)}"
         print(f"🔌 TTS connection error: {error_msg}")
         if token_id:
             report_token_status(token_id, "error", error_msg, api_key=proxy_api_key, client_name=client_name)

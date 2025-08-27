@@ -1,5 +1,5 @@
 ---
-title: HF-Inferoxy AI Hub
+title: AI-Inferoxy AI Hub
 emoji: 🚀
 colorFrom: purple
 colorTo: blue
@@ -11,9 +11,9 @@ hf_oauth_authorized_org:
     - nazdev
 ---
 
-## 🚀 HF‑Inferoxy AI Hub
+## 🚀 AI‑Inferoxy AI Hub
 
-A focused, multi‑modal AI workspace. Chat, create images, transform images, generate short videos, and synthesize speech — all routed through HF‑Inferoxy for secure, quota‑aware token management and provider failover.
+A focused, multi‑modal AI workspace. Chat, create images, transform images, generate short videos, and synthesize speech — all routed through AI‑Inferoxy for secure, quota‑aware token management and provider failover.
 
 ### Highlights
 - Chat, Image, Image‑to‑Image, Video, and TTS in one app
@@ -23,7 +23,7 @@ A focused, multi‑modal AI workspace. Chat, create images, transform images, ge
 
 ### Quick Start (Hugging Face Space)
 Add Space secrets:
-- `PROXY_URL`: HF‑Inferoxy server URL (e.g., `https://proxy.example.com`)
+- `PROXY_URL`: AI‑Inferoxy server URL (e.g., `https://proxy.example.com`)
 - `PROXY_KEY`: API key for your proxy
   
 Org access control: instead of a custom `ALLOWED_ORGS` secret and runtime checks, configure org restrictions in README metadata using `hf_oauth_authorized_org` per HF Spaces OAuth docs. Example:
@@ -38,7 +38,7 @@ hf_oauth_authorized_org:
 The app reads these at runtime — no extra setup required.
 
 ### How It Works
-1. The app requests a valid token from HF‑Inferoxy for each call.
+1. The app requests a valid token from AI‑Inferoxy for each call.
 2. Requests are sent to the selected provider (or `auto`).
 3. Status is reported back for rotation and telemetry.
 
@@ -54,12 +54,12 @@ The app reads these at runtime — no extra setup required.
 - Provider from dropdown. Default is `auto`.
 
 ### Providers
-Compatible with providers configured in HF‑Inferoxy, including `auto` (default), `hf-inference`, `cerebras`, `cohere`, `groq`, `together`, `fal-ai`, `replicate`, `nebius`, `nscale`, and others.
+Compatible with providers configured in AI‑Inferoxy, including `auto` (default), `hf-inference`, `cerebras`, `cohere`, `groq`, `together`, `fal-ai`, `replicate`, `nebius`, `nscale`, and others.
 
 ### Security
 - HF OAuth validates account; org membership is enforced by Space metadata (`hf_oauth_authorized_org`).
 - Inference uses proxy‑managed tokens. Secrets are Space secrets.
-- RBAC, rotation, and quarantine handled by HF‑Inferoxy.
+- RBAC, rotation, and quarantine handled by AI‑Inferoxy.
 
 ### Troubleshooting
 - 401/403: verify secrets and org access.
@@ -72,9 +72,9 @@ This project is licensed under the GNU Affero General Public License v3.0 (AGPL-
 
 ### Links
 - Live Space: [huggingface.co/spaces/nazdridoy/inferoxy-hub](https://huggingface.co/spaces/nazdridoy/inferoxy-hub)
-- HF‑Inferoxy docs: [nazdridoy.github.io/hf-inferoxy](https://nazdridoy.github.io/hf-inferoxy/)
+- AI‑Inferoxy docs: [ai-inferoxy/huggingface-hub-integration](https://nazdridoy.github.io/ai-inferoxy/)
 - Gradio docs: [gradio.app/docs](https://gradio.app/docs/)
 
-— Built with HF‑Inferoxy for intelligent token management.
+— Built with AI‑Inferoxy for intelligent token management.
 
 
