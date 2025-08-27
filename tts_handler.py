@@ -155,7 +155,7 @@ def generate_text_to_speech(
         return None, format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_val, speed_val, audio_url_val, exaggeration_val, temperature_val, cfg_val, hf_token: gr.OAuthToken = None):
+def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_val, speed_val, audio_url_val, exaggeration_val, temperature_val, cfg_val, hf_token: gr.OAuthToken = None, hf_profile: gr.OAuthProfile = None):
     """
     Handle text-to-speech generation request with validation.
     """
@@ -169,7 +169,7 @@ def handle_text_to_speech_generation(text_val, model_val, provider_val, voice_va
     
     # Require sign-in via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    username = None
+    username = getattr(hf_profile, "username", None) if hf_profile is not None else None
     if not access_token:
         return None, format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
     

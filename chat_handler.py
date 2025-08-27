@@ -168,7 +168,7 @@ def chat_respond(
         yield format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_chat_submit(message, history, system_msg, model_name, provider, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None):
+def handle_chat_submit(message, history, system_msg, model_name, provider, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None, hf_profile: gr.OAuthProfile = None):
     """
     Handle chat submission and manage conversation history with streaming.
     """
@@ -178,7 +178,7 @@ def handle_chat_submit(message, history, system_msg, model_name, provider, max_t
 
     # Require sign-in: if no token present, prompt login
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    username = None
+    username = getattr(hf_profile, "username", None) if hf_profile is not None else None
     if not access_token:
         assistant_response = format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
         current_history = history + [{"role": "assistant", "content": assistant_response}]
@@ -210,14 +210,14 @@ def handle_chat_submit(message, history, system_msg, model_name, provider, max_t
         yield current_history, ""
 
 
-def handle_chat_retry(history, system_msg, model_name, provider, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None, retry_data=None):
+def handle_chat_retry(history, system_msg, model_name, provider, max_tokens, temperature, top_p, hf_token: gr.OAuthToken = None, hf_profile: gr.OAuthProfile = None, retry_data=None):
     """
     Retry the assistant response for the selected message.
     Works with gr.Chatbot.retry() which provides retry_data.index for the message.
     """
     # Require sign-in: if no token present, prompt login
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    username = None
+    username = getattr(hf_profile, "username", None) if hf_profile is not None else None
     if not access_token:
         assistant_response = format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
         current_history = (history or []) + [{"role": "assistant", "content": assistant_response}]

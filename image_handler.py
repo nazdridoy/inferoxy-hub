@@ -279,7 +279,7 @@ def generate_image_to_image(
         return None, format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_image_to_image_generation(input_image_val, prompt_val, model_val, provider_val, negative_prompt_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None):
+def handle_image_to_image_generation(input_image_val, prompt_val, model_val, provider_val, negative_prompt_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None, hf_profile: gr.OAuthProfile = None):
     """
     Handle image-to-image generation request with validation.
     """
@@ -289,7 +289,7 @@ def handle_image_to_image_generation(input_image_val, prompt_val, model_val, pro
     
     # Require sign-in via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    username = None
+    username = getattr(hf_profile, "username", None) if hf_profile is not None else None
     if not access_token:
         return None, format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
     
@@ -307,7 +307,7 @@ def handle_image_to_image_generation(input_image_val, prompt_val, model_val, pro
     )
 
 
-def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt_val, width_val, height_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None):
+def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt_val, width_val, height_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None, hf_profile: gr.OAuthProfile = None):
     """
     Handle image generation request with validation.
     """
@@ -318,7 +318,7 @@ def handle_image_generation(prompt_val, model_val, provider_val, negative_prompt
     
     # Require sign-in via HF OAuth token
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    username = None
+    username = getattr(hf_profile, "username", None) if hf_profile is not None else None
     if not access_token:
         return None, format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
     

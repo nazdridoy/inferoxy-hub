@@ -132,7 +132,7 @@ def generate_video(
         return None, format_error_message("Unexpected Error", f"An unexpected error occurred: {error_msg}")
 
 
-def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None):
+def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guidance_val, seed_val, hf_token: gr.OAuthToken = None, hf_profile: gr.OAuthProfile = None):
     """
     Handle text-to-video generation request with validation and org access.
     """
@@ -140,7 +140,7 @@ def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guid
         return None, format_error_message("Validation Error", "Please enter a prompt for video generation")
 
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    username = None
+    username = getattr(hf_profile, "username", None) if hf_profile is not None else None
     if not access_token:
         return None, format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
 
