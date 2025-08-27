@@ -16,8 +16,6 @@ from utils import (
     validate_proxy_key,
     format_error_message,
     format_success_message,
-    check_org_access,
-    format_access_denied_message,
 )
 
 
@@ -142,9 +140,9 @@ def handle_video_generation(prompt_val, model_val, provider_val, steps_val, guid
         return None, format_error_message("Validation Error", "Please enter a prompt for video generation")
 
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, username, _matched = check_org_access(access_token)
-    if not is_allowed:
-        return None, format_access_denied_message(access_msg)
+    username = None
+    if not access_token:
+        return None, format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
 
     return generate_video(
         prompt=prompt_val.strip(),

@@ -7,6 +7,8 @@ sdk: gradio
 app_file: app.py
 pinned: false
 hf_oauth: true
+hf_oauth_authorized_org:
+    - nazdev
 ---
 
 ## 🚀 HF‑Inferoxy AI Hub
@@ -23,7 +25,15 @@ A focused, multi‑modal AI workspace. Chat, create images, transform images, ge
 Add Space secrets:
 - `PROXY_URL`: HF‑Inferoxy server URL (e.g., `https://proxy.example.com`)
 - `PROXY_KEY`: API key for your proxy
-- `ALLOWED_ORGS`: Comma/space‑separated org slugs allowed to use the Space
+  
+Org access control: instead of a custom `ALLOWED_ORGS` secret and runtime checks, configure org restrictions in README metadata using `hf_oauth_authorized_org` per HF Spaces OAuth docs. Example:
+
+```yaml
+hf_oauth: true
+hf_oauth_authorized_org:
+  - your-org-slug
+  - another-org
+```
 
 The app reads these at runtime — no extra setup required.
 
@@ -47,7 +57,7 @@ The app reads these at runtime — no extra setup required.
 Compatible with providers configured in HF‑Inferoxy, including `auto` (default), `hf-inference`, `cerebras`, `cohere`, `groq`, `together`, `fal-ai`, `replicate`, `nebius`, `nscale`, and others.
 
 ### Security
-- HF OAuth validates account/org membership (no inference scope).
+- HF OAuth validates account; org membership is enforced by Space metadata (`hf_oauth_authorized_org`).
 - Inference uses proxy‑managed tokens. Secrets are Space secrets.
 - RBAC, rotation, and quarantine handled by HF‑Inferoxy.
 

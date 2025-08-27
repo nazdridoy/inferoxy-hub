@@ -5,7 +5,6 @@ Contains configuration constants and helper functions.
 
 import os
 import re
-import requests
 
 
 # Configuration constants
@@ -299,69 +298,6 @@ def get_gradio_theme():
         return gr.themes.Soft()
     except ImportError:
         return None
-
-
-# -----------------------------
-# OAuth / Org Access Utilities
-# -----------------------------
-
-def _parse_allowed_orgs() -> list[str]:
-    """Parse comma/space separated ALLOWED_ORGS env var into a list of lowercase names."""
-    raw = os.getenv("ALLOWED_ORGS", "").strip()
-    if not raw:
-        return []
-    # support comma or whitespace separated
-    parts = [p.strip().lower() for p in raw.replace("\n", ",").replace(" ", ",").split(",") if p.strip()]
-    return list(dict.fromkeys(parts))  # dedupe while preserving order
-
-
-def fetch_hf_identity(access_token: str) -> tuple[bool, dict | None, str]:
-    """
-    Call whoami-v2 to get user identity and orgs.
-    Returns (success, data, error_message).
-    """
-    if not access_token:
-        return False, None, "Missing access token"
-    try:
-        resp = requests.get(
-            "https://huggingface.co/api/whoami-v2",
-            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            return False, None, f"HF whoami-v2 HTTP {resp.status_code}"
-        return True, resp.json(), ""
-    except requests.exceptions.RequestException as e:
-        return False, None, f"HF whoami-v2 error: {str(e)}"
-
-
-def check_org_access(access_token: str) -> tuple[bool, str, str | None, list[str]]:
-    """
-    Validate that the logged-in user belongs to any of ALLOWED_ORGS.
-    Returns (is_allowed, message, username, matched_orgs).
-    """
-    allowed_orgs = _parse_allowed_orgs()
-    if not access_token:
-        return False, "🔒 Please log in with Hugging Face to continue.", None, []
-    if not allowed_orgs:
-        return False, "❌ Access denied: ALLOWED_ORGS is not configured in Space secrets.", None, []
-
-    ok, data, err = fetch_hf_identity(access_token)
-    if not ok or not data:
-        return False, f"❌ Failed to verify identity: {err}", None, []
-
-    username = data.get("name") or data.get("fullname") or data.get("id")
-    org_objs = data.get("orgs", []) or []
-    user_org_names = [str(org.get("name", "")).lower() for org in org_objs if org.get("name")]
-    matched = sorted(list(set(user_org_names).intersection(set(allowed_orgs))))
-    if matched:
-        return True, f"✅ Access granted for @{username} in org(s): {', '.join(matched)}", username, matched
-    return False, f"🚫 Access denied for @{username}. Required org(s): {', '.join(allowed_orgs)}", username, []
-
-
-def format_access_denied_message(message: str) -> str:
-    """Return a standardized access denied message for UI display."""
-    return format_error_message("Access Denied", message)
 
 
 # -----------------------------

@@ -15,8 +15,6 @@ from hf_token_utils import get_proxy_token, report_token_status
 from utils import (
     validate_proxy_key, 
     format_error_message,
-    check_org_access,
-    format_access_denied_message,
     render_with_reasoning_toggle
 )
 
@@ -178,12 +176,11 @@ def handle_chat_submit(message, history, system_msg, model_name, provider, max_t
         yield history, ""
         return
 
-    # Enforce org-based access control via HF OAuth token
+    # Require sign-in: if no token present, prompt login
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, username, _matched = check_org_access(access_token)
-    if not is_allowed:
-        # Show access denied as assistant message
-        assistant_response = format_access_denied_message(access_msg)
+    username = None
+    if not access_token:
+        assistant_response = format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
         current_history = history + [{"role": "assistant", "content": assistant_response}]
         yield current_history, ""
         return
@@ -218,12 +215,11 @@ def handle_chat_retry(history, system_msg, model_name, provider, max_tokens, tem
     Retry the assistant response for the selected message.
     Works with gr.Chatbot.retry() which provides retry_data.index for the message.
     """
-    # Enforce org-based access control via HF OAuth token
+    # Require sign-in: if no token present, prompt login
     access_token = getattr(hf_token, "token", None) if hf_token is not None else None
-    is_allowed, access_msg, username, _matched = check_org_access(access_token)
-    if not is_allowed:
-        # Show access denied as assistant message
-        assistant_response = format_access_denied_message(access_msg)
+    username = None
+    if not access_token:
+        assistant_response = format_error_message("Access Required", "Please sign in with Hugging Face (sidebar Login button).")
         current_history = (history or []) + [{"role": "assistant", "content": assistant_response}]
         yield current_history
         return
