@@ -1,4 +1,4 @@
-gradio
+gradio==5.44.1
 huggingface-hub
 requests
 Pillow
