@@ -49,10 +49,16 @@ PROVIDERS_UNIFIED = [
     "nebius",
     "novita",
     "nscale",
+    "ovhcloud",
+    "publicai",
     "replicate",
     "sambanova",
+    "scaleway",
     "together",
+    "wavespeed",
+    "zai-org",
 ]
+
 
 # Backwards compatibility exported lists
 CHAT_PROVIDERS = PROVIDERS_UNIFIED
