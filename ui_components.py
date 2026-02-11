@@ -24,9 +24,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         # Chat interface at the top - most prominent
         chatbot_display = gr.Chatbot(
             label="Chat",
-            type="messages",
             height=800,
-            show_copy_button=True
         )
         
         # Chat input
@@ -89,7 +87,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         # Connect chat events (streaming auto-detected from generator function)
         # Show stop immediately when sending
         chat_submit.click(
-            fn=lambda: gr.update(visible=True),
+            fn=lambda: gr.Button(visible=True),
             inputs=None,
             outputs=[chat_stop],
             queue=False
@@ -104,7 +102,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         
         # Show stop immediately when pressing Enter
         chat_input.submit(
-            fn=lambda: gr.update(visible=True),
+            fn=lambda: gr.Button(visible=True),
             inputs=None,
             outputs=[chat_stop],
             queue=False
@@ -119,7 +117,7 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
 
         # Stop current chat generation
         chat_stop.click(
-            fn=lambda: gr.update(visible=False),
+            fn=lambda: gr.Button(visible=False),
             inputs=None,
             outputs=[chat_stop],
             cancels=[chat_send_event, chat_enter_event],
@@ -127,8 +125,8 @@ def create_chat_tab(handle_chat_submit_fn, handle_chat_retry_fn=None):
         )
 
         # Hide stop after completion of chat events
-        chat_send_event.then(lambda: gr.update(visible=False), None, [chat_stop], queue=False)
-        chat_enter_event.then(lambda: gr.update(visible=False), None, [chat_stop], queue=False)
+        chat_send_event.then(lambda: gr.Button(visible=False), None, [chat_stop], queue=False)
+        chat_enter_event.then(lambda: gr.Button(visible=False), None, [chat_stop], queue=False)
 
         # Enable retry icon and bind handler if provided
         if handle_chat_retry_fn is not None:
@@ -152,7 +150,6 @@ def create_image_tab(handle_image_generation_fn):
                     label="Generated Image", 
                     type="pil",
                     height=600,
-                    show_download_button=True
                 )
                 status_text = gr.Textbox(
                     label="Generation Status", 
@@ -240,7 +237,7 @@ def create_image_tab(handle_image_generation_fn):
         # Connect image generation events
         # Show stop immediately when starting generation
         generate_btn.click(
-            fn=lambda: gr.update(visible=True),
+            fn=lambda: gr.Button(visible=True),
             inputs=None,
             outputs=[stop_generate_btn],
             queue=False
@@ -257,7 +254,7 @@ def create_image_tab(handle_image_generation_fn):
 
         # Stop current image generation
         stop_generate_btn.click(
-            fn=lambda: gr.update(visible=False),
+            fn=lambda: gr.Button(visible=False),
             inputs=None,
             outputs=[stop_generate_btn],
             cancels=[gen_event],
@@ -265,7 +262,7 @@ def create_image_tab(handle_image_generation_fn):
         )
 
         # Hide stop after generation completes
-        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+        gen_event.then(lambda: gr.Button(visible=False), None, [stop_generate_btn], queue=False)
 
 
 def create_image_to_image_tab(handle_image_to_image_generation_fn):
@@ -280,7 +277,6 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
                     label="Input Image", 
                     type="pil",
                     height=400,
-                    show_download_button=True
                 )
                 
                 # Model and provider inputs
@@ -307,7 +303,6 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
                     label="Generated Image", 
                     type="pil",
                     height=400,
-                    show_download_button=True
                 )
                 status_text = gr.Textbox(
                     label="Generation Status", 
@@ -367,7 +362,7 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
         # Connect image-to-image generation events
         # Show stop immediately when starting generation
         generate_btn.click(
-            fn=lambda: gr.update(visible=True),
+            fn=lambda: gr.Button(visible=True),
             inputs=None,
             outputs=[stop_generate_btn],
             queue=False
@@ -384,7 +379,7 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
 
         # Stop current image-to-image generation
         stop_generate_btn.click(
-            fn=lambda: gr.update(visible=False),
+            fn=lambda: gr.Button(visible=False),
             inputs=None,
             outputs=[stop_generate_btn],
             cancels=[gen_event],
@@ -392,7 +387,7 @@ def create_image_to_image_tab(handle_image_to_image_generation_fn):
         )
 
         # Hide stop after generation completes
-        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+        gen_event.then(lambda: gr.Button(visible=False), None, [stop_generate_btn], queue=False)
 
 
 def create_tts_tab(handle_tts_generation_fn):
@@ -416,7 +411,6 @@ def create_tts_tab(handle_tts_generation_fn):
                     type="numpy",
                     interactive=False,
                     autoplay=True,
-                    show_download_button=True
                 )
                 status_text = gr.Textbox(
                     label="Generation Status",
@@ -498,13 +492,13 @@ def create_tts_tab(handle_tts_generation_fn):
         # Model change handler to show/hide appropriate settings
         def on_model_change(model_name):
             if model_name == "hexgrad/Kokoro-82M":
-                return gr.update(visible=True), gr.update(visible=False)
+                return gr.Group(visible=True), gr.Group(visible=False)
             elif model_name == "ResembleAI/chatterbox":
-                return gr.update(visible=False), gr.update(visible=True)
+                return gr.Group(visible=False), gr.Group(visible=True)
             elif model_name == "nari-labs/Dia-1.6B":
-                return gr.update(visible=False), gr.update(visible=False)
+                return gr.Group(visible=False), gr.Group(visible=False)
             else:
-                return gr.update(visible=False), gr.update(visible=False)
+                return gr.Group(visible=False), gr.Group(visible=False)
         
         # Connect model change event
         tts_model_name.change(
@@ -516,7 +510,7 @@ def create_tts_tab(handle_tts_generation_fn):
         # Connect TTS generation events
         # Show stop immediately when starting generation
         generate_btn.click(
-            fn=lambda: gr.update(visible=True),
+            fn=lambda: gr.Button(visible=True),
             inputs=None,
             outputs=[stop_generate_btn],
             queue=False
@@ -533,7 +527,7 @@ def create_tts_tab(handle_tts_generation_fn):
 
         # Stop current TTS generation
         stop_generate_btn.click(
-            fn=lambda: gr.update(visible=False),
+            fn=lambda: gr.Button(visible=False),
             inputs=None,
             outputs=[stop_generate_btn],
             cancels=[gen_event],
@@ -541,7 +535,7 @@ def create_tts_tab(handle_tts_generation_fn):
         )
 
         # Hide stop after generation completes
-        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+        gen_event.then(lambda: gr.Button(visible=False), None, [stop_generate_btn], queue=False)
 
 
 def create_video_tab(handle_video_generation_fn):
@@ -555,7 +549,6 @@ def create_video_tab(handle_video_generation_fn):
                 output_video = gr.Video(
                     label="Generated Video",
                     interactive=False,
-                    show_download_button=True,
                     height=480,
                 )
                 status_text = gr.Textbox(
@@ -631,7 +624,7 @@ def create_video_tab(handle_video_generation_fn):
 
         # Connect video generation events
         generate_btn.click(
-            fn=lambda: gr.update(visible=True),
+            fn=lambda: gr.Button(visible=True),
             inputs=None,
             outputs=[stop_generate_btn],
             queue=False
@@ -648,7 +641,7 @@ def create_video_tab(handle_video_generation_fn):
 
         # Stop current video generation
         stop_generate_btn.click(
-            fn=lambda: gr.update(visible=False),
+            fn=lambda: gr.Button(visible=False),
             inputs=None,
             outputs=[stop_generate_btn],
             cancels=[gen_event],
@@ -656,7 +649,7 @@ def create_video_tab(handle_video_generation_fn):
         )
 
         # Hide stop after generation completes
-        gen_event.then(lambda: gr.update(visible=False), None, [stop_generate_btn], queue=False)
+        gen_event.then(lambda: gr.Button(visible=False), None, [stop_generate_btn], queue=False)
 
 
 def create_image_to_image_examples(img2img_prompt):

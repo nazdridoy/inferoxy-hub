@@ -1,4 +1,4 @@
-gradio
+gradio[oauth]
 huggingface-hub
 requests
 Pillow

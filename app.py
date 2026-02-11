@@ -24,7 +24,7 @@ def create_app():
     """Create and configure the main Gradio application."""
     
     # Create the main Gradio interface with tabs
-    with gr.Blocks(title="AI-Inferoxy AI Hub", theme=get_gradio_theme()) as demo:
+    with gr.Blocks(title="AI-Inferoxy AI Hub") as demo:
         # Sidebar with HF OAuth login/logout
         with gr.Sidebar():
             gr.LoginButton()
@@ -56,4 +56,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.launch()
+    app.launch(theme=get_gradio_theme())
